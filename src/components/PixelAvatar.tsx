@@ -166,13 +166,9 @@ const PixelAvatar = ({
               exit={{ opacity: 0 }}
               className="absolute -bottom-1 -right-1"
             >
-              <motion.div
-                animate={{ scale: [1, 1.3, 1] }}
-                transition={{ duration: 0.8, repeat: Infinity }}
-                className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center border border-foreground"
-              >
+              <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center border border-foreground">
                 <div className="w-2 h-2 rounded-full bg-primary" />
-              </motion.div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
