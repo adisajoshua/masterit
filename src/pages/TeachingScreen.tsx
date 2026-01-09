@@ -189,16 +189,14 @@ const TeachingScreen = () => {
               <h2 className="text-xl font-display font-semibold text-foreground">
                 Your Explanation
               </h2>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <NeumorphicButton
                   size="sm"
                   variant="outline"
                   onClick={() => setInputMode("voice")}
                   className={cn(
-                    "w-10 h-10 !p-0",
-                    inputMode === "voice" 
-                      ? "border-primary bg-primary/10" 
-                      : "opacity-50"
+                    "w-10 h-10 p-0 flex items-center justify-center",
+                    inputMode === "voice" && "border-primary bg-primary/10"
                   )}
                 >
                   <Mic className="w-4 h-4" />
@@ -208,10 +206,8 @@ const TeachingScreen = () => {
                   variant="outline"
                   onClick={() => setInputMode("text")}
                   className={cn(
-                    "w-10 h-10 !p-0",
-                    inputMode === "text" 
-                      ? "border-primary bg-primary/10" 
-                      : "opacity-50"
+                    "w-10 h-10 p-0 flex items-center justify-center",
+                    inputMode === "text" && "border-primary bg-primary/10"
                   )}
                 >
                   <Keyboard className="w-4 h-4" />
