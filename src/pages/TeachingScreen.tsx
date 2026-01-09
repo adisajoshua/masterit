@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, Mic, Keyboard } from "lucide-react";
 import PixelAvatar from "@/components/PixelAvatar";
+import MessageBox from "@/components/ui/MessageBox";
 import NeumorphicButton from "@/components/neumorphic/NeumorphicButton";
 import NeumorphicTextArea from "@/components/neumorphic/NeumorphicTextArea";
 import ModeChip from "@/components/ui/ModeChip";
@@ -139,14 +140,10 @@ const TeachingScreen = () => {
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="lg:w-1/3 flex flex-col items-center"
+            className="lg:w-1/3 flex flex-col items-center gap-4"
           >
-            <PixelAvatar
-              state={avatarState}
-              size="lg"
-              showSpeechBubble
-              message={currentQuestion.text}
-            />
+            <PixelAvatar state={avatarState} size="lg" />
+            <MessageBox message={currentQuestion.text} />
 
             {/* Context toggle */}
             <motion.button

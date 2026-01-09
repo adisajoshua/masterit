@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import PixelAvatar from "@/components/PixelAvatar";
+import MessageBox from "@/components/ui/MessageBox";
 import LoadingDots from "@/components/ui/LoadingDots";
 import { cn } from "@/lib/utils";
 
@@ -49,12 +50,10 @@ const ProcessingScreen = () => {
         className="flex flex-col items-center gap-8 max-w-md w-full"
       >
         {/* Avatar thinking */}
-        <PixelAvatar
-          state="thinking"
-          size="xl"
-          showSpeechBubble
-          message="Let me analyze this material... 🧠"
-        />
+        <div className="flex flex-col items-center gap-4">
+          <PixelAvatar state="thinking" size="xl" />
+          <MessageBox message="Let me analyze this material... 🧠" />
+        </div>
 
         {/* Processing steps */}
         <motion.div
