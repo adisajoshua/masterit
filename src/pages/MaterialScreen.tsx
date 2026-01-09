@@ -22,8 +22,8 @@ const MaterialScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background grid-bg">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen bg-background grid-bg flex flex-col">
+      <div className="container mx-auto px-4 py-6 max-w-4xl">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -37,7 +37,7 @@ const MaterialScreen = () => {
         </motion.div>
 
         {/* Main content - Avatar left, Content right */}
-        <div className="flex flex-col lg:flex-row gap-8 items-start mt-8">
+        <div className="flex flex-col lg:flex-row gap-8 items-start flex-1 mt-16">
           {/* Avatar section */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
