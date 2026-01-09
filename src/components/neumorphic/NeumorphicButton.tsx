@@ -36,12 +36,25 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
     onTouchEnd,
     type = "button" 
   }, ref) => {
-    const baseStyles = "relative font-display font-semibold transition-all duration-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-coral/50";
+    const baseStyles = cn(
+      "relative font-display font-semibold transition-all duration-150 rounded-md",
+      "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+      "gumroad-btn"
+    );
     
     const variants = {
-      primary: "bg-coral text-primary-foreground hover:bg-coral-dark active:bg-coral-dark",
-      secondary: "bg-turquoise text-secondary-foreground hover:bg-turquoise-dark active:bg-turquoise-dark",
-      ghost: "bg-surface text-foreground neu-flat hover:neu-hover active:neu-pressed",
+      primary: cn(
+        "bg-primary text-primary-foreground border border-foreground",
+        "offset-yellow"
+      ),
+      secondary: cn(
+        "bg-foreground text-background border border-foreground",
+        "offset-yellow"
+      ),
+      ghost: cn(
+        "bg-surface text-foreground border border-foreground",
+        "offset-dark"
+      ),
     };
     
     const sizes = {
@@ -68,11 +81,10 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
           sizes[size],
           (disabled || isLoading) && disabledStyles,
           pulse && !disabled && "pulse-glow",
-          variant !== "ghost" && "shadow-lg hover:shadow-xl active:shadow-md",
           className
         )}
-        whileHover={{ scale: disabled ? 1 : 1.02 }}
-        whileTap={{ scale: disabled ? 1 : 0.98 }}
+        whileHover={disabled ? undefined : { y: -4 }}
+        whileTap={disabled ? undefined : { y: 0 }}
         disabled={disabled || isLoading}
       >
         {isLoading ? (

@@ -32,9 +32,9 @@ const ProgressBar = ({
   const filledSegments = Math.ceil((percentage / 100) * segments);
   
   const getColor = (percent: number) => {
-    if (percent >= 80) return "bg-turquoise";
-    if (percent >= 50) return "bg-gold";
-    return "bg-coral";
+    if (percent >= 80) return "bg-accent-teal";
+    if (percent >= 50) return "bg-accent-yellow";
+    return "bg-primary";
   };
   
   const sizes = {
@@ -45,7 +45,10 @@ const ProgressBar = ({
   
   return (
     <div className={cn("w-full", className)}>
-      <div className={cn("flex gap-1 rounded-lg overflow-hidden", sizes[size])}>
+      <div className={cn(
+        "flex gap-1 rounded-sm overflow-hidden border border-foreground bg-surface p-0.5",
+        sizes[size]
+      )}>
         {Array.from({ length: segments }).map((_, i) => (
           <motion.div
             key={i}

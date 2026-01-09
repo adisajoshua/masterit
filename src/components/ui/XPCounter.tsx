@@ -51,12 +51,12 @@ const XPCounter = ({ value, streak = 0, size = "md", className }: XPCounterProps
   return (
     <div className={cn("relative flex items-center gap-2", className)}>
       <div className={cn(
-        "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
-        "bg-gold/20 text-foreground font-mono-display font-bold",
+        "flex items-center gap-1.5 px-3 py-1.5 rounded-sm",
+        "bg-accent-yellow/20 text-foreground font-mono-display font-bold border border-foreground",
         sizes[size]
       )}>
         <Flame className={cn(
-          "text-orange",
+          "text-accent-coral",
           size === "sm" ? "w-4 h-4" : size === "md" ? "w-5 h-5" : "w-6 h-6"
         )} />
         <motion.span
@@ -71,7 +71,7 @@ const XPCounter = ({ value, streak = 0, size = "md", className }: XPCounterProps
       </div>
       
       {streak > 0 && (
-        <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-orange/20 text-orange text-micro font-medium">
+        <div className="flex items-center gap-1 px-2 py-1 rounded-sm bg-accent-coral/20 text-accent-coral text-micro font-medium border border-foreground">
           {Array.from({ length: Math.min(streak, 5) }).map((_, i) => (
             <Flame key={i} className="w-3 h-3" />
           ))}
@@ -85,7 +85,7 @@ const XPCounter = ({ value, streak = 0, size = "md", className }: XPCounterProps
             initial={{ opacity: 1, y: 0 }}
             animate={{ opacity: 0, y: -30 }}
             exit={{ opacity: 0 }}
-            className="absolute -top-2 left-1/2 -translate-x-1/2 text-gold font-bold text-small"
+            className="absolute -top-2 left-1/2 -translate-x-1/2 text-accent-yellow font-bold text-small"
           >
             +{floatingXP}
           </motion.div>
