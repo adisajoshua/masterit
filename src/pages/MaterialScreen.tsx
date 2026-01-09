@@ -90,7 +90,7 @@ const MaterialScreen = () => {
 
               <NeumorphicButton
                 onClick={handleUseSample}
-                variant="secondary"
+                variant="outline"
                 className="sm:w-auto"
               >
                 Use Sample (Evolution)

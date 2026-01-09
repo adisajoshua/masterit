@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface NeumorphicButtonProps {
-  variant?: "primary" | "secondary" | "outline" | "ghost";
+  variant?: "primary" | "outline" | "ghost";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
   disabled?: boolean;
@@ -44,10 +44,6 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
       primary: cn(
         "bg-[hsl(var(--accent-yellow))] text-foreground border border-foreground",
         "offset-pink"
-      ),
-      secondary: cn(
-        "bg-[hsl(var(--accent-yellow))] text-foreground border border-foreground",
-        "offset-dark"
       ),
       outline: cn(
         "bg-surface text-foreground border border-foreground",
