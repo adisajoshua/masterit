@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import PixelAvatar from "@/components/PixelAvatar";
+import MessageBox from "@/components/ui/MessageBox";
 import NeumorphicButton from "@/components/neumorphic/NeumorphicButton";
 import NeumorphicCard from "@/components/neumorphic/NeumorphicCard";
 import ModeChip from "@/components/ui/ModeChip";
@@ -41,12 +42,10 @@ const ConceptsScreen = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="lg:w-1/4 flex flex-col items-center lg:sticky lg:top-8"
+            className="lg:w-1/4 flex flex-col items-center gap-4 lg:sticky lg:top-8"
           >
-            <PixelAvatar
-              state={selectedConcept ? "celebrating" : "idle"}
-              size="lg"
-              showSpeechBubble
+            <PixelAvatar state={selectedConcept ? "celebrating" : "idle"} size="lg" />
+            <MessageBox
               message={
                 selectedConcept
                   ? `Great choice! Let's master "${selectedConcept.title}" together!`

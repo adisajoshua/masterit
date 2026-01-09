@@ -7,8 +7,6 @@ export type AvatarState = "idle" | "listening" | "thinking" | "speaking" | "cele
 interface PixelAvatarProps {
   state?: AvatarState;
   size?: "sm" | "md" | "lg" | "xl";
-  message?: string;
-  showSpeechBubble?: boolean;
   className?: string;
 }
 
@@ -53,37 +51,12 @@ const stateAnimations: Record<AvatarState, { scale?: number | number[]; rotate?:
 const PixelAvatar = ({
   state = "idle",
   size = "lg",
-  message,
-  showSpeechBubble = false,
   className,
 }: PixelAvatarProps) => {
   const animation = stateAnimations[state];
   
   return (
     <div className={cn("relative flex flex-col items-center", className)}>
-      {/* Speech Bubble - Gumroad style with black border */}
-      <AnimatePresence>
-        {showSpeechBubble && message && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.9 }}
-            className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-full z-10"
-          >
-            <div className="relative bg-surface border border-foreground rounded-md px-4 py-3 max-w-[280px] shadow-soft">
-              <p className="text-sm text-foreground leading-relaxed">{message}</p>
-              {/* Speech bubble tail */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
-                <div className="relative">
-                  <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-foreground" />
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-surface" />
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Avatar Container - Gumroad style with border */}
       <motion.div
         animate={{

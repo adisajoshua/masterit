@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import PixelAvatar from "@/components/PixelAvatar";
+import MessageBox from "@/components/ui/MessageBox";
 import NeumorphicButton from "@/components/neumorphic/NeumorphicButton";
 import NeumorphicInput from "@/components/neumorphic/NeumorphicInput";
 import { useApp } from "@/context/AppContext";
@@ -25,16 +26,19 @@ const WelcomeScreen = () => {
         className="flex flex-col items-center gap-8 max-w-md w-full"
       >
         {/* Avatar with greeting */}
-        <PixelAvatar
-          state={showInput ? "listening" : "speaking"}
-          size="xl"
-          showSpeechBubble
-          message={
-            showInput
-              ? `Nice to meet you${userName ? `, ${userName}` : ""}! Ready to become the teacher?`
-              : "Hey there! I'm Pixel, your study buddy. Teaching me helps YOU learn better!"
-          }
-        />
+        <div className="flex flex-col items-center gap-4">
+          <PixelAvatar
+            state={showInput ? "listening" : "speaking"}
+            size="xl"
+          />
+          <MessageBox
+            message={
+              showInput
+                ? `Nice to meet you${userName ? `, ${userName}` : ""}! Ready to become the teacher?`
+                : "Hey there! I'm Pixel, your study buddy. Teaching me helps YOU learn better!"
+            }
+          />
+        </div>
 
         {/* Intro text or input */}
         <motion.div

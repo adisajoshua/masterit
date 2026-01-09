@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import PixelAvatar from "@/components/PixelAvatar";
+import MessageBox from "@/components/ui/MessageBox";
 import NeumorphicButton from "@/components/neumorphic/NeumorphicButton";
 import NeumorphicTextArea from "@/components/neumorphic/NeumorphicTextArea";
 import ModeChip from "@/components/ui/ModeChip";
@@ -45,14 +46,10 @@ const MaterialScreen = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="lg:w-1/3 flex flex-col items-center lg:sticky lg:top-8"
+            className="lg:w-1/3 flex flex-col items-center gap-4 lg:sticky lg:top-8"
           >
-            <PixelAvatar
-              state="listening"
-              size="lg"
-              showSpeechBubble
-              message="Paste your study material below. I'll read it and we'll practice together!"
-            />
+            <PixelAvatar state="listening" size="lg" />
+            <MessageBox message="Paste your study material below. I'll read it and we'll practice together!" />
           </motion.div>
 
           {/* Input section */}
