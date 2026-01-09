@@ -2,20 +2,16 @@ import { ButtonHTMLAttributes, forwardRef } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-interface NeumorphicButtonProps {
+interface NeumorphicButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "ghost";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
-  pulseGlow?: boolean;
-  disabled?: boolean;
-  className?: string;
+  pulse?: boolean;
   children?: React.ReactNode;
-  onClick?: () => void;
-  type?: "button" | "submit" | "reset";
 }
 
 const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
-  ({ className, variant = "primary", size = "md", isLoading, pulseGlow, disabled, children, onClick, type = "button" }, ref) => {
+  ({ className, variant = "primary", size = "md", isLoading, pulse, disabled, children, type = "button", ...props }, ref) => {
     const baseStyles = "relative font-display font-semibold transition-all duration-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-coral/50";
     
     const variants = {
@@ -36,19 +32,19 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
       <motion.button
         ref={ref}
         type={type}
-        onClick={onClick}
         className={cn(
           baseStyles,
           variants[variant],
           sizes[size],
           (disabled || isLoading) && disabledStyles,
-          pulseGlow && !disabled && "pulse-glow",
+          pulse && !disabled && "pulse-glow",
           variant !== "ghost" && "shadow-lg hover:shadow-xl active:shadow-md",
           className
         )}
         whileHover={{ scale: disabled ? 1 : 1.02 }}
         whileTap={{ scale: disabled ? 1 : 0.98 }}
         disabled={disabled || isLoading}
+        {...props}
       >
         {isLoading ? (
           <span className="flex items-center justify-center gap-2">

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ConfettiProps {
-  active: boolean;
+  active?: boolean;
   duration?: number;
 }
 
@@ -14,7 +14,7 @@ const colors = [
   "hsl(var(--mint))",
 ];
 
-const Confetti = ({ active, duration = 3000 }: ConfettiProps) => {
+const Confetti = ({ active = true, duration = 3000 }: ConfettiProps) => {
   const [pieces, setPieces] = useState<Array<{
     id: number;
     x: number;
