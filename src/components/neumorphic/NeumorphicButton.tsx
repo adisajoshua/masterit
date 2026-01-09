@@ -1,17 +1,41 @@
-import { ButtonHTMLAttributes, forwardRef } from "react";
+import { forwardRef } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-interface NeumorphicButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface NeumorphicButtonProps {
   variant?: "primary" | "secondary" | "ghost";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
   pulse?: boolean;
+  disabled?: boolean;
+  className?: string;
   children?: React.ReactNode;
+  onClick?: () => void;
+  onMouseDown?: () => void;
+  onMouseUp?: () => void;
+  onMouseLeave?: () => void;
+  onTouchStart?: () => void;
+  onTouchEnd?: () => void;
+  type?: "button" | "submit" | "reset";
 }
 
 const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
-  ({ className, variant = "primary", size = "md", isLoading, pulse, disabled, children, type = "button", ...props }, ref) => {
+  ({ 
+    className, 
+    variant = "primary", 
+    size = "md", 
+    isLoading, 
+    pulse, 
+    disabled, 
+    children, 
+    onClick, 
+    onMouseDown,
+    onMouseUp,
+    onMouseLeave,
+    onTouchStart,
+    onTouchEnd,
+    type = "button" 
+  }, ref) => {
     const baseStyles = "relative font-display font-semibold transition-all duration-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-coral/50";
     
     const variants = {
@@ -32,6 +56,12 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
       <motion.button
         ref={ref}
         type={type}
+        onClick={onClick}
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseLeave}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
         className={cn(
           baseStyles,
           variants[variant],
@@ -44,7 +74,6 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
         whileHover={{ scale: disabled ? 1 : 1.02 }}
         whileTap={{ scale: disabled ? 1 : 0.98 }}
         disabled={disabled || isLoading}
-        {...props}
       >
         {isLoading ? (
           <span className="flex items-center justify-center gap-2">

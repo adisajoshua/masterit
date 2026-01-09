@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { cn } from "@/lib/utils";
 import PixelFace from "@/assets/pixel-avatar.svg";
 
@@ -19,15 +19,15 @@ const sizeClasses = {
   xl: "w-48 h-48",
 };
 
-const stateAnimations = {
+const stateAnimations: Record<AvatarState, { scale?: number | number[]; rotate?: number[]; y?: number[]; transition: Transition }> = {
   idle: {
     scale: [1, 1.02, 1],
-    transition: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+    transition: { duration: 3, repeat: Infinity, ease: "easeInOut" as const },
   },
   listening: {
     scale: 1.05,
     rotate: [0, -3, 3, 0],
-    transition: { duration: 0.5, rotate: { duration: 2, repeat: Infinity } },
+    transition: { duration: 0.5 },
   },
   thinking: {
     rotate: [0, -5, 0],
@@ -57,6 +57,8 @@ const PixelAvatar = ({
   showSpeechBubble = false,
   className,
 }: PixelAvatarProps) => {
+  const animation = stateAnimations[state];
+  
   return (
     <div className={cn("relative flex flex-col items-center", className)}>
       {/* Speech Bubble */}
@@ -81,7 +83,12 @@ const PixelAvatar = ({
 
       {/* Avatar Container */}
       <motion.div
-        animate={stateAnimations[state]}
+        animate={{
+          scale: animation.scale,
+          rotate: animation.rotate,
+          y: animation.y,
+        }}
+        transition={animation.transition}
         className={cn(
           "relative rounded-full neu-convex p-3 flex items-center justify-center",
           sizeClasses[size]

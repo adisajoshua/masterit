@@ -211,7 +211,7 @@ const TeachingScreen = () => {
                 <div className="flex flex-col items-center justify-center h-full min-h-[150px] gap-4">
                   {isRecording ? (
                     <>
-                      <Waveform isActive />
+                      <Waveform active />
                       <p className="text-coral font-medium">Listening...</p>
                     </>
                   ) : answer ? (

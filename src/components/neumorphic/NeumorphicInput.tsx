@@ -1,20 +1,16 @@
-import { forwardRef, useState } from "react";
+import { forwardRef, useState, InputHTMLAttributes } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 
-interface NeumorphicInputProps {
+interface NeumorphicInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   showValidCheck?: boolean;
   isValid?: boolean;
-  placeholder?: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  className?: string;
 }
 
 const NeumorphicInput = forwardRef<HTMLInputElement, NeumorphicInputProps>(
-  ({ className, label, showValidCheck, isValid, placeholder, value, onChange }, ref) => {
+  ({ className, label, showValidCheck, isValid, ...props }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
     
     return (
@@ -27,9 +23,6 @@ const NeumorphicInput = forwardRef<HTMLInputElement, NeumorphicInputProps>(
         <div className="relative">
           <input
             ref={ref}
-            value={value}
-            onChange={onChange}
-            placeholder={placeholder}
             className={cn(
               "w-full px-6 py-4 text-body font-sans rounded-xl",
               "bg-background transition-all duration-200",
@@ -41,6 +34,7 @@ const NeumorphicInput = forwardRef<HTMLInputElement, NeumorphicInputProps>(
             )}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
+            {...props}
           />
           {showValidCheck && isValid && (
             <motion.div
