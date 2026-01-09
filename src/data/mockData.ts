@@ -19,44 +19,82 @@ MECHANISMS OF EVOLUTION:
 
 CLASSIC EXAMPLE: Peppered moths in England. Before industrialization, light-colored moths were common on lichen-covered trees. After pollution darkened the trees, dark-colored moths had better camouflage and became more common.`;
 
+export interface Question {
+  id: string;
+  text: string;
+  expectedAnswer: string;
+}
+
 export interface Concept {
   id: string;
   title: string;
   snippet: string;
   confidence: number;
-  stars: number;
-  source: string;
-  estimatedTime: string;
+  mastery: number;
+  questions: Question[];
+}
+
+export interface CycleSummary {
+  masteryPercentage: number;
+  xpEarned: number;
+  strengths: string[];
+  gaps: string[];
 }
 
 export const concepts: Concept[] = [
   {
-    id: "EVO-001",
+    id: "natural-selection",
     title: "Natural Selection",
-    snippet: "Organisms with advantageous traits survive and reproduce more",
-    confidence: 0.95,
-    stars: 5,
-    source: "Charles Darwin proposed... survive and reproduce more successfully.",
-    estimatedTime: "8-10 minutes"
+    snippet: "Organisms with advantageous traits survive and reproduce more successfully, leading to gradual changes in populations over generations.",
+    confidence: 5,
+    mastery: 85,
+    questions: [
+      { id: "q1", text: "What is natural selection in simple terms?", expectedAnswer: "It's when organisms with helpful traits survive better and have more offspring, so those traits become more common over time." },
+      { id: "q2", text: "How does this cause species to change?", expectedAnswer: "Over many generations, helpful traits keep getting passed on while harmful ones disappear, so the whole population slowly changes." },
+      { id: "q3", text: "Can you give me a real example?", expectedAnswer: "The peppered moths in England - when pollution darkened the trees, dark moths survived better because birds couldn't see them." }
+    ]
   },
   {
-    id: "EVO-002",
+    id: "evidence-evolution",
     title: "Evidence for Evolution",
-    snippet: "Fossils, anatomy, embryology, DNA, biogeography",
-    confidence: 0.88,
-    stars: 4,
-    source: "KEY EVIDENCE: 1. Fossil records... matches evolutionary history",
-    estimatedTime: "12-15 minutes"
+    snippet: "Multiple lines of evidence support evolution: fossils, comparative anatomy, embryology, DNA, and biogeography.",
+    confidence: 4,
+    mastery: 72,
+    questions: [
+      { id: "q1", text: "What proof do we have that evolution happened?", expectedAnswer: "Fossil records, similar bone structures in different animals, similar embryos, matching DNA sequences, and species distribution patterns." },
+      { id: "q2", text: "What are transitional forms?", expectedAnswer: "Fossils that show features of both ancestor and descendant species, like Archaeopteryx with bird feathers but dinosaur teeth." },
+      { id: "q3", text: "How does DNA prove evolution?", expectedAnswer: "Closely related species have more similar DNA - humans and chimps share 98% of their DNA." }
+    ]
   },
   {
-    id: "EVO-003",
+    id: "genetic-drift",
     title: "Genetic Drift",
-    snippet: "Random changes in allele frequencies in small populations",
-    confidence: 0.75,
-    stars: 3,
-    source: "Genetic Drift: Bottleneck effect and founder effect",
-    estimatedTime: "6-8 minutes"
+    snippet: "Random changes in allele frequencies, especially in small populations. Includes bottleneck and founder effects.",
+    confidence: 3,
+    mastery: 40,
+    questions: [
+      { id: "q1", text: "What is genetic drift?", expectedAnswer: "Random changes in gene frequencies that aren't based on survival advantage - any trait can increase or decrease by chance." },
+      { id: "q2", text: "What is the bottleneck effect?", expectedAnswer: "When a population is drastically reduced, survivors have only a fraction of original genetic diversity." },
+      { id: "q3", text: "What is the founder effect?", expectedAnswer: "When a small group starts a new population, they only carry a sample of the original gene pool." }
+    ]
   }
+];
+
+export const mockCycleSummaries: Record<string, CycleSummary> = {
+  "natural-selection": { masteryPercentage: 85, xpEarned: 75, strengths: ["Clear definitions", "Great examples"], gaps: ["Types of selection"] },
+  "evidence-evolution": { masteryPercentage: 72, xpEarned: 60, strengths: ["Comprehensive overview"], gaps: ["Homologous structures detail"] },
+  "genetic-drift": { masteryPercentage: 40, xpEarned: 30, strengths: ["Basic understanding"], gaps: ["Real-world examples", "Population size impact"] }
+};
+
+export const mockSession = {
+  sourceText: evolutionInputText,
+  concepts,
+  sessionStats: { timeSpent: "22:30", questionsAnswered: 9, gapsToReview: ["Genetic drift mechanisms", "Types of selection"] }
+};
+
+export const mockAchievements = [
+  { id: "first-lesson", title: "First Lesson", description: "Complete your first teaching cycle", xp: 100, icon: "🎓" },
+  { id: "clear-teacher", title: "Clear Teacher", description: "Score above 80% on any cycle", xp: 50, icon: "✨" }
 ];
 
 export interface Question {
