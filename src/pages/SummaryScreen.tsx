@@ -5,6 +5,7 @@ import { Check, AlertCircle, Flame, ArrowRight, RotateCcw, BookOpen } from "luci
 import PixelAvatar from "@/components/PixelAvatar";
 import NeumorphicButton from "@/components/neumorphic/NeumorphicButton";
 import Confetti from "@/components/ui/Confetti";
+import BackNavigation from "@/components/ui/BackNavigation";
 import { useApp } from "@/context/AppContext";
 import { cn } from "@/lib/utils";
 
@@ -76,8 +77,10 @@ const SummaryScreen = () => {
   const stars = getStarRating(currentCycleSummary.masteryPercentage);
 
   return (
-    <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-6">
-      {showConfetti && <Confetti />}
+    <div className="min-h-screen bg-background grid-bg flex flex-col">
+      <BackNavigation backTo="/teaching" backLabel="Back to Teaching" />
+      <div className="flex-1 flex items-center justify-center p-6">
+        {showConfetti && <Confetti />}
 
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
@@ -231,6 +234,7 @@ const SummaryScreen = () => {
           </div>
         </div>
       </motion.div>
+      </div>
     </div>
   );
 };
