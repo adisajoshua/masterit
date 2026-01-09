@@ -173,43 +173,46 @@
     box-shadow: var(--shadow-soft);
   }
   
-  /* Gumroad-style button with offset shadow - shows on hover only */
-  .gumroad-btn {
+  /* Gumroad-style button - Two-layer wrapper + face architecture */
+  
+  /* WRAPPER - stationary, owns the offset pseudo-element */
+  .gumroad-btn-wrap {
     position: relative;
-    z-index: 0;
-    isolation: isolate; /* Creates proper stacking context */
+    display: inline-flex;
+    isolation: isolate;
+    border-radius: inherit;
   }
   
-  .gumroad-btn::before {
+  .gumroad-btn-wrap::before {
     content: "";
     position: absolute;
     inset: 0;
     transform: translate(6px, 6px);
     border-radius: inherit;
-    z-index: -1; /* Now properly behind due to isolation */
+    z-index: 0;
     opacity: 0;
-    transition: opacity 150ms ease, transform 150ms ease;
+    transition: opacity 150ms ease;
     pointer-events: none;
   }
   
-  .gumroad-btn:hover {
-    transform: translateY(-4px);
-  }
-  
-  .gumroad-btn:hover::before {
+  /* Show offset on hover (wrapper controls this, not face) */
+  .gumroad-btn-wrap:hover::before {
     opacity: 1;
   }
   
-  .gumroad-btn:active {
-    transform: translateY(0);
+  /* Hide offset when disabled */
+  .gumroad-btn-wrap[data-disabled="true"]::before {
+    display: none;
   }
   
-  .gumroad-btn:active::before {
-    opacity: 1;
-    transform: translate(2px, 2px);
+  /* FACE - the actual button, moves on hover via Framer Motion */
+  .gumroad-btn-face {
+    position: relative;
+    z-index: 1;
+    width: 100%;
   }
   
-  /* Offset shadow variations */
+  /* Offset shadow variations - applied to WRAPPER */
   .offset-yellow::before {
     background: hsl(var(--accent-yellow));
     border: 1px solid hsl(var(--foreground));
@@ -228,6 +231,11 @@
   .offset-teal::before {
     background: hsl(var(--accent-teal));
     border: 1px solid hsl(var(--foreground));
+  }
+  
+  /* Legacy .gumroad-btn class - for backwards compatibility */
+  .gumroad-btn {
+    position: relative;
   }
   
   /* Legacy neumorphic classes - now mapped to Gumroad style */
