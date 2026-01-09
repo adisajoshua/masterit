@@ -183,15 +183,23 @@ const TeachingScreen = () => {
               <div className="flex gap-2">
                 <NeumorphicButton
                   size="sm"
-                  variant={inputMode === "voice" ? "primary" : "secondary"}
+                  variant="outline"
                   onClick={() => setInputMode("voice")}
+                  className={cn(
+                    "w-10 h-10 p-0 flex items-center justify-center",
+                    inputMode === "voice" && "border-primary bg-primary/10"
+                  )}
                 >
                   <Mic className="w-4 h-4" />
                 </NeumorphicButton>
                 <NeumorphicButton
                   size="sm"
-                  variant={inputMode === "text" ? "primary" : "secondary"}
+                  variant="outline"
                   onClick={() => setInputMode("text")}
+                  className={cn(
+                    "w-10 h-10 p-0 flex items-center justify-center",
+                    inputMode === "text" && "border-primary bg-primary/10"
+                  )}
                 >
                   <Keyboard className="w-4 h-4" />
                 </NeumorphicButton>
@@ -245,12 +253,14 @@ const TeachingScreen = () => {
                   onMouseLeave={() => isRecording && handleVoiceRelease()}
                   onTouchStart={handleVoiceHold}
                   onTouchEnd={handleVoiceRelease}
-                  variant={isRecording ? "primary" : "secondary"}
-                  className="flex-1"
+                  variant="secondary"
+                  className="flex-1 relative"
                   disabled={isEvaluating}
                 >
-                  <Mic className={cn("w-5 h-5 mr-2", isRecording && "animate-pulse")} />
-                  {isRecording ? "Recording..." : "Hold to Speak"}
+                  <Mic className="w-5 h-5 absolute left-4" />
+                  <span className="w-full text-center">
+                    {isRecording ? "Recording..." : "Hold to Speak"}
+                  </span>
                 </NeumorphicButton>
               )}
 
@@ -258,8 +268,7 @@ const TeachingScreen = () => {
                 onClick={handleSubmit}
                 disabled={!answer.trim() || isEvaluating}
                 variant="primary"
-                className="flex-1"
-                pulse={!!answer.trim() && !isEvaluating}
+                className="flex-1 flex items-center justify-center"
               >
                 {isEvaluating ? "Evaluating..." : "Submit Answer"}
               </NeumorphicButton>

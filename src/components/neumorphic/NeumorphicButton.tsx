@@ -3,10 +3,9 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface NeumorphicButtonProps {
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "outline" | "ghost";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
-  pulse?: boolean;
   disabled?: boolean;
   className?: string;
   children?: React.ReactNode;
@@ -25,7 +24,6 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
     variant = "primary", 
     size = "md", 
     isLoading, 
-    pulse, 
     disabled, 
     children, 
     onClick, 
@@ -44,16 +42,19 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
     
     const variants = {
       primary: cn(
-        "bg-primary text-primary-foreground border border-foreground",
-        "offset-yellow"
+        "bg-[hsl(var(--accent-yellow))] text-foreground border border-foreground",
+        "offset-pink"
       ),
       secondary: cn(
-        "bg-foreground text-background border border-foreground",
-        "offset-yellow"
+        "bg-[hsl(var(--accent-yellow))] text-foreground border border-foreground",
+        "offset-dark"
       ),
-      ghost: cn(
+      outline: cn(
         "bg-surface text-foreground border border-foreground",
         "offset-dark"
+      ),
+      ghost: cn(
+        "bg-transparent text-foreground border border-transparent hover:border-foreground"
       ),
     };
     
@@ -80,7 +81,6 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
           variants[variant],
           sizes[size],
           (disabled || isLoading) && disabledStyles,
-          pulse && !disabled && "pulse-glow",
           className
         )}
         whileHover={disabled ? undefined : { y: -4 }}

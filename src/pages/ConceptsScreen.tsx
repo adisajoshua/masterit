@@ -156,7 +156,6 @@ const ConceptsScreen = () => {
                 disabled={!selectedConcept}
                 variant="primary"
                 size="lg"
-                pulse={!!selectedConcept}
               >
                 🎓 Teach This!
               </NeumorphicButton>

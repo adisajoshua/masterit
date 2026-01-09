@@ -84,7 +84,6 @@ const MaterialScreen = () => {
                 disabled={studyMaterial.length < 100}
                 variant="primary"
                 className="flex-1"
-                pulse={studyMaterial.length >= 100}
               >
                 Start Teaching
               </NeumorphicButton>
