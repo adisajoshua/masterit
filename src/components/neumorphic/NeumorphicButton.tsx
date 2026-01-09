@@ -34,25 +34,21 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
     onTouchEnd,
     type = "button" 
   }, ref) => {
-    const baseStyles = cn(
-      "relative font-display font-semibold transition-all duration-150 rounded-md",
-      "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-      "gumroad-btn"
-    );
+    const isDisabled = disabled || isLoading;
     
-    const variants = {
-      primary: cn(
-        "bg-[hsl(var(--accent-yellow))] text-foreground border border-foreground",
-        "offset-pink"
-      ),
-      outline: cn(
-        "bg-surface text-foreground border border-foreground",
-        "offset-dark"
-      ),
-      ghost: cn(
-        "bg-transparent text-foreground border border-transparent hover:border-foreground"
-      ),
-    };
+    // Offset class goes on WRAPPER, not face
+    const offsetClass = {
+      primary: "offset-pink",
+      outline: "offset-dark",
+      ghost: "",
+    }[variant];
+    
+    // Face styles (background, border, text)
+    const faceStyles = {
+      primary: "bg-[hsl(var(--accent-yellow))] text-foreground border border-foreground",
+      outline: "bg-surface text-foreground border border-foreground",
+      ghost: "bg-transparent text-foreground border border-transparent hover:border-foreground",
+    }[variant];
     
     const sizes = {
       sm: "px-4 py-2 text-small",
@@ -60,42 +56,51 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
       lg: "px-8 py-4 text-h3",
     };
     
-    const disabledStyles = "opacity-50 cursor-not-allowed pointer-events-none";
-    
     return (
-      <motion.button
-        ref={ref}
-        type={type}
-        onClick={onClick}
-        onMouseDown={onMouseDown}
-        onMouseUp={onMouseUp}
-        onMouseLeave={onMouseLeave}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
+      // WRAPPER - stationary, owns offset pseudo-element
+      <div
         className={cn(
-          baseStyles,
-          variants[variant],
-          sizes[size],
-          (disabled || isLoading) && disabledStyles,
+          "gumroad-btn-wrap inline-flex rounded-md",
+          offsetClass,
           className
         )}
-        whileHover={disabled ? undefined : { y: -4 }}
-        whileTap={disabled ? undefined : { y: 0 }}
-        disabled={disabled || isLoading}
+        data-disabled={isDisabled}
       >
-        {isLoading ? (
-          <span className="flex items-center justify-center gap-2">
-            <motion.span
-              className="w-5 h-5 border-2 border-current border-t-transparent rounded-full"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            />
-            <span>Loading...</span>
-          </span>
-        ) : (
-          children
-        )}
-      </motion.button>
+        {/* FACE - moves on hover via Framer Motion */}
+        <motion.button
+          ref={ref}
+          type={type}
+          onClick={onClick}
+          onMouseDown={onMouseDown}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseLeave}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+          className={cn(
+            "gumroad-btn-face rounded-md font-display font-semibold transition-colors",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+            faceStyles,
+            sizes[size],
+            isDisabled && "opacity-50 cursor-not-allowed"
+          )}
+          whileHover={isDisabled ? undefined : { y: -4 }}
+          whileTap={isDisabled ? undefined : { y: 0 }}
+          disabled={isDisabled}
+        >
+          {isLoading ? (
+            <span className="flex items-center justify-center gap-2">
+              <motion.span
+                className="w-5 h-5 border-2 border-current border-t-transparent rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              />
+              <span>Loading...</span>
+            </span>
+          ) : (
+            children
+          )}
+        </motion.button>
+      </div>
     );
   }
 );
