@@ -25,12 +25,11 @@ const NeumorphicTextArea = forwardRef<HTMLTextAreaElement, NeumorphicTextAreaPro
             value={value}
             maxLength={maxLength}
             className={cn(
-              "w-full px-6 py-4 text-body font-sans rounded-xl min-h-[200px] resize-none",
-              "bg-background transition-all duration-200",
-              "neu-pressed",
+              "w-full px-6 py-4 text-body font-sans rounded-md min-h-[200px] resize-none",
+              "bg-surface border border-foreground transition-all duration-150",
               "placeholder:text-muted-foreground/50",
               "focus:outline-none",
-              isFocused && "ring-2 ring-coral/50 shadow-[0_0_20px_hsl(var(--coral)/0.2)]",
+              isFocused && "ring-2 ring-primary border-primary",
               className
             )}
             onFocus={() => setIsFocused(true)}
@@ -42,7 +41,7 @@ const NeumorphicTextArea = forwardRef<HTMLTextAreaElement, NeumorphicTextAreaPro
               <span className={cn(
                 "text-micro font-mono-display transition-colors",
                 charPercentage > 90 ? "text-alert" : 
-                charPercentage > 70 ? "text-orange" : 
+                charPercentage > 70 ? "text-accent-coral" : 
                 "text-muted-foreground"
               )}>
                 {charCount.toLocaleString()}/{maxLength.toLocaleString()}

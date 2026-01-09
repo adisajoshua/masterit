@@ -15,13 +15,19 @@ export default {
     extend: {
       colors: {
         border: "hsl(var(--border))",
+        "border-subtle": "hsl(var(--border-subtle))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         surface: "hsl(var(--surface))",
         
-        // MasterIt Brand Colors
+        // Gumroad Accent Colors
+        "accent-teal": "hsl(var(--accent-teal))",
+        "accent-yellow": "hsl(var(--accent-yellow))",
+        "accent-coral": "hsl(var(--accent-coral))",
+        
+        // Legacy MasterIt Brand Colors (mapped to new system)
         coral: {
           DEFAULT: "hsl(var(--coral))",
           light: "hsl(var(--coral-light))",
@@ -97,12 +103,27 @@ export default {
         'small': ['14px', { lineHeight: '1.5', fontWeight: '400' }],
         'micro': ['12px', { lineHeight: '1.4', fontWeight: '400' }],
       },
+      spacing: {
+        '1': '4px',
+        '2': '8px',
+        '3': '16px',
+        '4': '24px',
+        '5': '32px',
+      },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        xl: "calc(var(--radius) + 4px)",
-        "2xl": "calc(var(--radius) + 8px)",
+        sm: "var(--radius-sm)",
+        DEFAULT: "var(--radius)",
+        md: "var(--radius)",
+        lg: "var(--radius-lg)",
+        xl: "calc(var(--radius-lg) + 4px)",
+        "2xl": "calc(var(--radius-lg) + 8px)",
+      },
+      boxShadow: {
+        'soft': '0 6px 12px rgba(11, 11, 11, 0.06)',
+        'offset-yellow': '6px 6px 0 hsl(43 100% 65%)',
+        'offset-dark': '6px 6px 0 hsl(0 0% 4%)',
+        'offset-pink': '6px 6px 0 hsl(342 100% 65%)',
+        'offset-teal': '6px 6px 0 hsl(174 100% 38%)',
       },
       keyframes: {
         "accordion-down": {

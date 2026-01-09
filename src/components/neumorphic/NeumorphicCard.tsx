@@ -19,19 +19,20 @@ const NeumorphicCard = forwardRef<HTMLDivElement, NeumorphicCardProps>(
         ref={ref}
         onClick={onClick}
         className={cn(
-          "relative p-6 rounded-2xl transition-all duration-200 cursor-pointer",
-          "neu-flat",
-          selected && "ring-4 ring-coral shadow-[0_0_20px_hsl(var(--coral)/0.3)]",
+          "relative p-6 rounded-md transition-all duration-150 cursor-pointer",
+          "bg-surface border border-foreground",
+          selected && "border-primary border-2 shadow-offset-pink",
+          !selected && hoverable && "hover:shadow-soft hover:-translate-y-1",
           className
         )}
-        whileHover={hoverable ? { y: -4, scale: 1.02 } : undefined}
+        whileHover={hoverable && !selected ? { y: -4 } : undefined}
         whileTap={hoverable ? { scale: 0.98 } : undefined}
       >
         {selected && (
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-coral flex items-center justify-center shadow-lg"
+            className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-primary flex items-center justify-center border-2 border-foreground"
           >
             <Check className="w-5 h-5 text-primary-foreground" />
           </motion.div>
@@ -44,7 +45,7 @@ const NeumorphicCard = forwardRef<HTMLDivElement, NeumorphicCardProps>(
                 key={i}
                 className={cn(
                   "w-4 h-4 transition-colors",
-                  i <= stars ? "fill-gold text-gold" : "text-muted"
+                  i <= stars ? "fill-accent-yellow text-accent-yellow" : "text-muted"
                 )}
               />
             ))}

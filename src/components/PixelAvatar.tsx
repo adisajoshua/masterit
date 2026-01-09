@@ -61,7 +61,7 @@ const PixelAvatar = ({
   
   return (
     <div className={cn("relative flex flex-col items-center", className)}>
-      {/* Speech Bubble */}
+      {/* Speech Bubble - Gumroad style with black border */}
       <AnimatePresence>
         {showSpeechBubble && message && (
           <motion.div
@@ -70,18 +70,21 @@ const PixelAvatar = ({
             exit={{ opacity: 0, y: -10, scale: 0.9 }}
             className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-full z-10"
           >
-            <div className="relative bg-card neu-flat rounded-2xl px-4 py-3 max-w-[280px]">
+            <div className="relative bg-surface border border-foreground rounded-md px-4 py-3 max-w-[280px] shadow-soft">
               <p className="text-sm text-foreground leading-relaxed">{message}</p>
               {/* Speech bubble tail */}
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
-                <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-card" />
+                <div className="relative">
+                  <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-foreground" />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-surface" />
+                </div>
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Avatar Container */}
+      {/* Avatar Container - Gumroad style with border */}
       <motion.div
         animate={{
           scale: animation.scale,
@@ -90,7 +93,7 @@ const PixelAvatar = ({
         }}
         transition={animation.transition}
         className={cn(
-          "relative rounded-full neu-convex p-3 flex items-center justify-center",
+          "relative rounded-full bg-surface border border-foreground p-3 flex items-center justify-center",
           sizeClasses[size]
         )}
       >
@@ -180,9 +183,9 @@ const PixelAvatar = ({
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 0.5, repeat: Infinity }}
-                className="w-6 h-6 rounded-full bg-turquoise/20 flex items-center justify-center"
+                className="w-6 h-6 rounded-full bg-accent-teal/20 flex items-center justify-center border border-foreground"
               >
-                <div className="w-3 h-3 rounded-full bg-turquoise" />
+                <div className="w-3 h-3 rounded-full bg-accent-teal" />
               </motion.div>
             </motion.div>
           )}
@@ -197,9 +200,9 @@ const PixelAvatar = ({
               <motion.div
                 animate={{ scale: [1, 1.3, 1] }}
                 transition={{ duration: 0.8, repeat: Infinity }}
-                className="w-6 h-6 rounded-full bg-coral/20 flex items-center justify-center"
+                className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center border border-foreground"
               >
-                <div className="w-2 h-2 rounded-full bg-coral" />
+                <div className="w-2 h-2 rounded-full bg-primary" />
               </motion.div>
             </motion.div>
           )}

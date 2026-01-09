@@ -8,12 +8,32 @@ interface ModeChipProps {
   className?: string;
 }
 
-const modeConfig: Record<Mode, { label: string; color: string; bgColor: string }> = {
-  setup: { label: "Setup", color: "text-turquoise", bgColor: "bg-turquoise/20" },
-  selection: { label: "Selection", color: "text-sky-blue", bgColor: "bg-sky-blue/20" },
-  teaching: { label: "Teaching", color: "text-coral", bgColor: "bg-coral/20" },
-  evaluation: { label: "Evaluating", color: "text-gold", bgColor: "bg-gold/20" },
-  review: { label: "Review", color: "text-mint", bgColor: "bg-mint/20" },
+const modeConfig: Record<Mode, { label: string; bgColor: string; dotColor: string }> = {
+  setup: { 
+    label: "Setup", 
+    bgColor: "bg-accent-teal/20 text-foreground border border-foreground", 
+    dotColor: "bg-accent-teal" 
+  },
+  selection: { 
+    label: "Selection", 
+    bgColor: "bg-sky-blue/20 text-foreground border border-foreground", 
+    dotColor: "bg-sky-blue" 
+  },
+  teaching: { 
+    label: "Teaching", 
+    bgColor: "bg-primary/20 text-foreground border border-foreground", 
+    dotColor: "bg-primary" 
+  },
+  evaluation: { 
+    label: "Evaluating", 
+    bgColor: "bg-accent-yellow/20 text-foreground border border-foreground", 
+    dotColor: "bg-accent-yellow" 
+  },
+  review: { 
+    label: "Review", 
+    bgColor: "bg-mint/20 text-foreground border border-foreground", 
+    dotColor: "bg-mint" 
+  },
 };
 
 const ModeChip = ({ mode, className }: ModeChipProps) => {
@@ -22,9 +42,8 @@ const ModeChip = ({ mode, className }: ModeChipProps) => {
   return (
     <motion.div
       className={cn(
-        "inline-flex items-center gap-2 px-4 py-2 rounded-full font-mono-display text-small font-medium",
+        "inline-flex items-center gap-2 px-4 py-2 rounded-sm font-mono-display text-small font-medium",
         config.bgColor,
-        config.color,
         className
       )}
       initial={{ scale: 0.9, opacity: 0 }}
@@ -32,7 +51,7 @@ const ModeChip = ({ mode, className }: ModeChipProps) => {
       transition={{ duration: 0.2 }}
     >
       <motion.span
-        className={cn("w-2 h-2 rounded-full", config.color.replace("text-", "bg-"))}
+        className={cn("w-2 h-2 rounded-full", config.dotColor)}
         animate={{ scale: [1, 1.2, 1] }}
         transition={{ duration: 2, repeat: Infinity }}
       />
