@@ -189,7 +189,7 @@ const TeachingScreen = () => {
               <h2 className="text-xl font-display font-semibold text-foreground">
                 Your Explanation
               </h2>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <NeumorphicButton
                   size="sm"
                   variant="outline"
