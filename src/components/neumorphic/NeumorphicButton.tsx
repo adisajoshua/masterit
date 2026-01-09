@@ -60,7 +60,7 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
       // WRAPPER - stationary, owns offset pseudo-element
       <div
         className={cn(
-          "gumroad-btn-wrap inline-flex rounded-md",
+          "gumroad-btn-wrap inline-flex items-center justify-center rounded-md",
           offsetClass,
           className
         )}
