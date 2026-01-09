@@ -37,7 +37,7 @@ const MaterialScreen = () => {
         </motion.div>
 
         {/* Main content - Avatar left, Content right */}
-        <div className="flex flex-col lg:flex-row gap-8 items-start flex-1 mt-16">
+        <div className="flex flex-col lg:flex-row gap-8 items-start flex-1 mt-48">
           {/* Avatar section */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
