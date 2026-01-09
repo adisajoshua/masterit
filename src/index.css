@@ -173,7 +173,7 @@
     box-shadow: var(--shadow-soft);
   }
   
-  /* Gumroad-style button with offset shadow */
+  /* Gumroad-style button with offset shadow - shows on hover only */
   .gumroad-btn {
     position: relative;
     z-index: 1;
@@ -186,7 +186,8 @@
     transform: translate(6px, 6px);
     border-radius: inherit;
     z-index: -1;
-    transition: transform 150ms ease;
+    opacity: 0;
+    transition: opacity 150ms ease, transform 150ms ease;
   }
   
   .gumroad-btn:hover {
@@ -194,6 +195,7 @@
   }
   
   .gumroad-btn:hover::before {
+    opacity: 1;
     transform: translate(8px, 8px);
   }
   
@@ -202,6 +204,7 @@
   }
   
   .gumroad-btn:active::before {
+    opacity: 1;
     transform: translate(2px, 2px);
   }
   
@@ -264,19 +267,7 @@
     font-family: 'Space Mono', monospace;
   }
   
-  /* Pulse glow animation - Gumroad style with offset */
-  .pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-  
-  @keyframes pulse-glow {
-    0%, 100% {
-      box-shadow: 6px 6px 0 hsl(var(--accent-yellow));
-    }
-    50% {
-      box-shadow: 8px 8px 0 hsl(var(--accent-yellow)), 0 0 20px hsl(var(--primary) / 0.3);
-    }
-  }
+  /* Removed pulse-glow animation - no blinking effects */
   
   /* Breathing animation for avatar */
   .breathing {

@@ -87,7 +87,6 @@ const WelcomeScreen = () => {
                 disabled={userName.length < 2}
                 variant="primary"
                 className="w-full"
-                pulse={userName.length >= 2}
               >
                 Continue
               </NeumorphicButton>
