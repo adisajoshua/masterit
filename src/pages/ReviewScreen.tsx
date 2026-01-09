@@ -38,7 +38,7 @@ const ReviewScreen = () => {
         </motion.div>
 
         {/* Main content */}
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-8 mt-28">
           {/* Avatar section */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
