@@ -2,8 +2,10 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface ProgressBarProps {
-  value: number;
+  value?: number;
   max?: number;
+  current?: number;
+  total?: number;
   segments?: number;
   showPercentage?: boolean;
   size?: "sm" | "md" | "lg";
@@ -14,13 +16,19 @@ interface ProgressBarProps {
 const ProgressBar = ({
   value,
   max = 100,
+  current,
+  total,
   segments = 10,
   showPercentage = false,
   size = "md",
   animated = true,
   className,
 }: ProgressBarProps) => {
-  const percentage = Math.min((value / max) * 100, 100);
+  // Support both value/max and current/total APIs
+  const percentage = current !== undefined && total !== undefined
+    ? Math.min((current / total) * 100, 100)
+    : Math.min(((value || 0) / max) * 100, 100);
+    
   const filledSegments = Math.ceil((percentage / 100) * segments);
   
   const getColor = (percent: number) => {
