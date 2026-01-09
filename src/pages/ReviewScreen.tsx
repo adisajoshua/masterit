@@ -5,6 +5,7 @@ import PixelAvatar from "@/components/PixelAvatar";
 import NeumorphicButton from "@/components/neumorphic/NeumorphicButton";
 import ModeChip from "@/components/ui/ModeChip";
 import XPCounter from "@/components/ui/XPCounter";
+import BackNavigation from "@/components/ui/BackNavigation";
 import { useApp } from "@/context/AppContext";
 import { mockSession, mockAchievements } from "@/data/mockData";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ const ReviewScreen = () => {
 
   return (
     <div className="min-h-screen bg-background grid-bg">
+      <BackNavigation backTo="/concepts" backLabel="Back to Concepts" />
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Header */}
         <motion.div

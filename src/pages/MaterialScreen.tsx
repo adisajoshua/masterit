@@ -4,6 +4,7 @@ import PixelAvatar from "@/components/PixelAvatar";
 import NeumorphicButton from "@/components/neumorphic/NeumorphicButton";
 import NeumorphicTextArea from "@/components/neumorphic/NeumorphicTextArea";
 import ModeChip from "@/components/ui/ModeChip";
+import BackNavigation from "@/components/ui/BackNavigation";
 import { useApp } from "@/context/AppContext";
 import { mockSession } from "@/data/mockData";
 
@@ -23,6 +24,7 @@ const MaterialScreen = () => {
 
   return (
     <div className="min-h-screen bg-background grid-bg flex flex-col">
+      <BackNavigation backTo="/" backLabel="Back to Welcome" />
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         {/* Header */}
         <motion.div

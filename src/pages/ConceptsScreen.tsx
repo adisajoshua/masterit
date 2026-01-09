@@ -6,6 +6,7 @@ import NeumorphicButton from "@/components/neumorphic/NeumorphicButton";
 import NeumorphicCard from "@/components/neumorphic/NeumorphicCard";
 import ModeChip from "@/components/ui/ModeChip";
 import XPCounter from "@/components/ui/XPCounter";
+import BackNavigation from "@/components/ui/BackNavigation";
 import { useApp } from "@/context/AppContext";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,7 @@ const ConceptsScreen = () => {
 
   return (
     <div className="min-h-screen bg-background grid-bg">
+      <BackNavigation backTo="/material" backLabel="Back to Material" />
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Header */}
         <motion.div

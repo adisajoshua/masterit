@@ -9,6 +9,7 @@ import ModeChip from "@/components/ui/ModeChip";
 import XPCounter from "@/components/ui/XPCounter";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Waveform from "@/components/ui/Waveform";
+import BackNavigation from "@/components/ui/BackNavigation";
 import { useApp } from "@/context/AppContext";
 import { mockCycleSummaries } from "@/data/mockData";
 import { cn } from "@/lib/utils";
@@ -92,12 +93,23 @@ const TeachingScreen = () => {
     }, 1500);
   };
 
+  const handleRestart = () => {
+    setCurrentQuestionIndex(0);
+    setAnswer("");
+    setAvatarState("speaking");
+  };
+
   if (!selectedConcept || !currentQuestion) {
     return null;
   }
 
   return (
     <div className="min-h-screen bg-background grid-bg">
+      <BackNavigation
+        backTo="/concepts"
+        backLabel="Back to Concepts"
+        rightAction={{ label: "Restart", onClick: handleRestart }}
+      />
       <div className="container mx-auto px-4 py-6 max-w-5xl">
         {/* Header */}
         <motion.div
