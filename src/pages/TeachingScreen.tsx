@@ -253,7 +253,7 @@ const TeachingScreen = () => {
                   onMouseLeave={() => isRecording && handleVoiceRelease()}
                   onTouchStart={handleVoiceHold}
                   onTouchEnd={handleVoiceRelease}
-                  variant="secondary"
+                  variant="outline"
                   className="flex-1 relative"
                   disabled={isEvaluating}
                 >

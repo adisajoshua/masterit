@@ -212,7 +212,7 @@ const ReviewScreen = () => {
               className="flex flex-col sm:flex-row gap-4 pt-4"
             >
               <NeumorphicButton
-                variant="secondary"
+                variant="outline"
                 className="flex-1"
                 onClick={() => {}}
               >

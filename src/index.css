@@ -176,7 +176,8 @@
   /* Gumroad-style button with offset shadow - shows on hover only */
   .gumroad-btn {
     position: relative;
-    z-index: 1;
+    z-index: 0;
+    isolation: isolate; /* Creates proper stacking context */
   }
   
   .gumroad-btn::before {
@@ -185,9 +186,10 @@
     inset: 0;
     transform: translate(6px, 6px);
     border-radius: inherit;
-    z-index: -1;
+    z-index: -1; /* Now properly behind due to isolation */
     opacity: 0;
     transition: opacity 150ms ease, transform 150ms ease;
+    pointer-events: none;
   }
   
   .gumroad-btn:hover {
@@ -196,7 +198,6 @@
   
   .gumroad-btn:hover::before {
     opacity: 1;
-    transform: translate(8px, 8px);
   }
   
   .gumroad-btn:active {
@@ -211,18 +212,22 @@
   /* Offset shadow variations */
   .offset-yellow::before {
     background: hsl(var(--accent-yellow));
+    border: 1px solid hsl(var(--foreground));
   }
   
   .offset-dark::before {
     background: hsl(var(--foreground));
+    border: 1px solid hsl(var(--foreground));
   }
   
   .offset-pink::before {
     background: hsl(var(--primary));
+    border: 1px solid hsl(var(--foreground));
   }
   
   .offset-teal::before {
     background: hsl(var(--accent-teal));
+    border: 1px solid hsl(var(--foreground));
   }
   
   /* Legacy neumorphic classes - now mapped to Gumroad style */

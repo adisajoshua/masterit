@@ -204,7 +204,7 @@ const SummaryScreen = () => {
           <div className="space-y-3 pt-4">
             <NeumorphicButton
               onClick={handleDeeperDive}
-              variant="secondary"
+              variant="outline"
               className="w-full"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
@@ -222,7 +222,7 @@ const SummaryScreen = () => {
 
             <NeumorphicButton
               onClick={handleReviewAll}
-              variant="secondary"
+              variant="outline"
               className="w-full"
             >
               <BookOpen className="w-4 h-4 mr-2" />
