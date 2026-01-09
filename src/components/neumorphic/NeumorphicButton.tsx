@@ -78,6 +78,7 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
           onTouchEnd={onTouchEnd}
           className={cn(
             "gumroad-btn-face rounded-md font-display font-semibold transition-colors",
+            "flex items-center justify-center",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
             faceStyles,
             sizes[size],
