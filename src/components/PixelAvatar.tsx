@@ -146,31 +146,7 @@ const PixelAvatar = ({
             </>
           )}
 
-          {state === "speaking" && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute -bottom-1 -right-1"
-            >
-              <div className="w-6 h-6 rounded-full bg-accent-teal/20 flex items-center justify-center border border-foreground">
-                <div className="w-3 h-3 rounded-full bg-accent-teal" />
-              </div>
-            </motion.div>
-          )}
 
-          {state === "listening" && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute -bottom-1 -right-1"
-            >
-              <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center border border-foreground">
-                <div className="w-2 h-2 rounded-full bg-primary" />
-              </div>
-            </motion.div>
-          )}
         </AnimatePresence>
       </motion.div>
     </div>
