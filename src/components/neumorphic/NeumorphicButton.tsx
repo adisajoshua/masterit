@@ -61,8 +61,7 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
       <div
         className={cn(
           "gumroad-btn-wrap inline-flex items-center justify-center rounded-md",
-          offsetClass,
-          className
+          offsetClass
         )}
         data-disabled={isDisabled}
       >
@@ -82,7 +81,8 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
             faceStyles,
             sizes[size],
-            isDisabled && "opacity-50 cursor-not-allowed"
+            isDisabled && "opacity-50 cursor-not-allowed",
+            className
           )}
           whileHover={isDisabled ? undefined : { y: -4 }}
           whileTap={isDisabled ? undefined : { y: 0 }}
