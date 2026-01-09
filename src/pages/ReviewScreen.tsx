@@ -42,14 +42,14 @@ const ReviewScreen = () => {
 
         {/* Main content */}
         <div className="flex flex-col lg:flex-row gap-8 mt-28">
-          {/* Avatar section */}
+          {/* Avatar section - horizontal on mobile/tablet, vertical on desktop */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="lg:w-1/4 flex flex-col items-center gap-4 lg:sticky lg:top-8"
+            className="w-full lg:w-1/4 flex flex-row lg:flex-col items-center gap-4 lg:sticky lg:top-8"
           >
-            <PixelAvatar state="celebrating" size="lg" />
-            <MessageBox message="Great session! You're becoming a master teacher! 🎉" />
+            <PixelAvatar state="celebrating" size="lg" className="flex-shrink-0" />
+            <MessageBox message="Great session! You're becoming a master teacher! 🎉" variant="dotted" />
           </motion.div>
 
           {/* Stats section */}

@@ -49,10 +49,10 @@ const ProcessingScreen = () => {
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col items-center gap-8 max-w-md w-full"
       >
-        {/* Avatar thinking */}
-        <div className="flex flex-col items-center gap-4">
-          <PixelAvatar state="thinking" size="xl" />
-          <MessageBox message="Let me analyze this material... 🧠" />
+        {/* Avatar thinking - centered modal style */}
+        <div className="flex items-center gap-4">
+          <PixelAvatar state="thinking" size="lg" />
+          <MessageBox message="Let me analyze this material... 🧠" variant="dotted" />
         </div>
 
         {/* Processing steps */}

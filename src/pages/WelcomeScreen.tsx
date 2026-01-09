@@ -25,11 +25,11 @@ const WelcomeScreen = () => {
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col items-center gap-8 max-w-md w-full"
       >
-        {/* Avatar with greeting */}
-        <div className="flex flex-col items-center gap-4">
+        {/* Avatar with greeting - horizontal layout to preserve visual hierarchy */}
+        <div className="flex items-center gap-4">
           <PixelAvatar
             state={showInput ? "listening" : "speaking"}
-            size="xl"
+            size="lg"
           />
           <MessageBox
             message={
@@ -37,6 +37,7 @@ const WelcomeScreen = () => {
                 ? `Nice to meet you${userName ? `, ${userName}` : ""}! Ready to become the teacher?`
                 : "Hey there! I'm Pixel, your study buddy. Teaching me helps YOU learn better!"
             }
+            variant="dotted"
           />
         </div>
 
