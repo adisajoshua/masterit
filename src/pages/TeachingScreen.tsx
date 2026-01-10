@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff, Mic, Keyboard } from "lucide-react";
+import { motion } from "framer-motion";
+import { Eye, Mic, Keyboard } from "lucide-react";
 import PixelAvatar from "@/components/PixelAvatar";
 import MessageBox from "@/components/ui/MessageBox";
 import NeumorphicButton from "@/components/neumorphic/NeumorphicButton";
@@ -11,8 +11,9 @@ import XPCounter from "@/components/ui/XPCounter";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Waveform from "@/components/ui/Waveform";
 import BackNavigation from "@/components/ui/BackNavigation";
+import SourceMaterialModal from "@/components/ui/SourceMaterialModal";
 import { useApp } from "@/context/AppContext";
-import { mockCycleSummaries } from "@/data/mockData";
+import { mockCycleSummaries, concepts } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import type { AvatarState } from "@/components/PixelAvatar";
 
@@ -28,7 +29,7 @@ const TeachingScreen = () => {
   } = useApp();
 
   const [answer, setAnswer] = useState("");
-  const [showContext, setShowContext] = useState(false);
+  const [showMaterialModal, setShowMaterialModal] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [inputMode, setInputMode] = useState<"voice" | "text">("voice");
   const [avatarState, setAvatarState] = useState<AvatarState>("speaking");
@@ -145,38 +146,24 @@ const TeachingScreen = () => {
             <PixelAvatar state={avatarState} size="lg" className="flex-shrink-0" />
             <MessageBox message={currentQuestion.text} variant="dotted" />
 
-            {/* Context toggle */}
+            {/* Source material toggle */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => setShowContext(!showContext)}
+              onClick={() => setShowMaterialModal(true)}
               className="mt-4 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              {showContext ? (
-                <EyeOff className="w-4 h-4" />
-              ) : (
-                <Eye className="w-4 h-4" />
-              )}
-              {showContext ? "Hide" : "Show"} source material
+              <Eye className="w-4 h-4" />
+              Show source material
             </motion.button>
 
-            {/* Context panel */}
-            <AnimatePresence>
-              {showContext && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mt-4 w-full"
-                >
-                  <div className="neu-inset rounded-xl p-4 max-h-48 overflow-y-auto">
-                    <p className="text-sm text-muted-foreground">
-                      {selectedConcept.snippet}
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Source Material Modal */}
+            <SourceMaterialModal
+              isOpen={showMaterialModal}
+              onClose={() => setShowMaterialModal(false)}
+              concepts={concepts}
+              activeConceptId={selectedConcept.id}
+            />
           </motion.div>
 
           {/* Answer section */}
