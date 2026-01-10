@@ -25,50 +25,56 @@ const WelcomeScreen = () => {
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col items-center gap-8 max-w-md w-full"
       >
-        {/* Avatar with greeting - horizontal layout to preserve visual hierarchy */}
-        <div className="flex items-center gap-4">
-          <PixelAvatar
-            state={showInput ? "listening" : "speaking"}
-            size="lg"
-          />
-          <MessageBox
-            message={
-              showInput
-                ? `Nice to meet you${userName ? `, ${userName}` : ""}! Ready to become the teacher?`
-                : "Hey there! I'm Pixel, your study buddy. Teaching me helps YOU learn better!"
-            }
-            variant="dotted"
-          />
-        </div>
-
-        {/* Intro text or input */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="w-full space-y-6"
-        >
-          {!showInput ? (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-              className="text-center space-y-4"
-            >
+        {!showInput ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="w-full space-y-6"
+          >
+            {/* Welcome text on top */}
+            <div className="text-center space-y-2">
               <h1 className="text-3xl font-display font-bold text-foreground">
                 Welcome to <span className="text-coral">MasterIt</span>
               </h1>
               <p className="text-muted-foreground">
                 The best way to learn is to teach. Let's get started!
               </p>
-              <NeumorphicButton
-                onClick={() => setShowInput(true)}
-                className="mt-4"
-              >
+            </div>
+
+            {/* Mascot container */}
+            <div className="flex items-center gap-4 justify-center">
+              <PixelAvatar state="speaking" size="lg" />
+              <MessageBox
+                message="Hey there! I'm Pixel, your study buddy. Teaching me helps YOU learn better!"
+                variant="dotted"
+              />
+            </div>
+
+            {/* CTA button */}
+            <div className="flex justify-center">
+              <NeumorphicButton onClick={() => setShowInput(true)}>
                 Let's Go!
               </NeumorphicButton>
-            </motion.div>
-          ) : (
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="w-full space-y-6"
+          >
+            {/* Mascot with updated message */}
+            <div className="flex items-center gap-4 justify-center">
+              <PixelAvatar state="listening" size="lg" />
+              <MessageBox
+                message={`Nice to meet you${userName ? `, ${userName}` : ""}! Ready to become the teacher?`}
+                variant="dotted"
+              />
+            </div>
+
+            {/* Name input form */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -96,8 +102,8 @@ const WelcomeScreen = () => {
                 Continue
               </NeumorphicButton>
             </motion.div>
-          )}
-        </motion.div>
+          </motion.div>
+        )}
       </motion.div>
     </div>
   );
