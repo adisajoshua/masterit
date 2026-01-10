@@ -42,12 +42,12 @@ const SourceMaterialModal = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         className={cn(
-          "max-w-2xl w-[95vw] max-h-[85vh] overflow-hidden",
+          "max-w-2xl w-[95vw] max-h-[80vh] flex flex-col overflow-hidden",
           "bg-surface border border-foreground rounded-xl",
           "shadow-offset-dark p-0"
         )}
       >
-        <DialogHeader className="sticky top-0 z-10 bg-surface border-b border-foreground/20 px-6 py-4">
+        <DialogHeader className="flex-shrink-0 bg-surface border-b border-foreground/20 px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-coral/20 flex items-center justify-center">
               <BookOpen className="w-5 h-5 text-coral" />
@@ -61,7 +61,7 @@ const SourceMaterialModal = ({
           </DialogClose>
         </DialogHeader>
 
-        <div className="overflow-y-auto px-6 py-4 space-y-4 max-h-[calc(85vh-80px)]">
+        <div className="flex-1 overflow-y-auto px-6 py-4 pb-8 space-y-4">
           <AnimatePresence mode="wait">
             {concepts.map((concept, index) => {
               const isActive = concept.id === activeConceptId;
