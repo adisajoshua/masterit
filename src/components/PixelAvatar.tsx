@@ -129,7 +129,7 @@ const PixelAvatar = ({
         }} className="w-full h-full object-visible" />
           </AnimatePresence>
         </motion.div> : <div className={cn("relative flex items-center justify-center overflow-visible", sizeClasses[size])}>
-          <img src={imageSrc} alt="Pixel the study buddy" className="w-full h-full" />
+          <img src={imageSrc} alt="Pixel the study buddy" className="w-full h-full object-contain" />
         </div>}
     </div>;
 };
