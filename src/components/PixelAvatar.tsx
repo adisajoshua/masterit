@@ -1,6 +1,11 @@
 import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { cn } from "@/lib/utils";
-import PixelFace from "@/assets/pixel-avatar.svg";
+
+// Import mascot SVG variants
+import DefaultFace from "@/assets/mascot/default.svg";
+import ConfusedFace from "@/assets/mascot/confused.svg";
+import CelebrationFace from "@/assets/mascot/celebration.svg";
+import SpeakingFace from "@/assets/mascot/speaking.svg";
 
 export type AvatarState = "idle" | "listening" | "thinking" | "speaking" | "celebrating" | "confused";
 
@@ -17,34 +22,43 @@ const sizeClasses = {
   xl: "w-48 h-48",
 };
 
+// Map each state to its corresponding SVG
+const stateImages: Record<AvatarState, string> = {
+  idle: DefaultFace,
+  listening: ConfusedFace,
+  thinking: ConfusedFace,
+  speaking: SpeakingFace,
+  celebrating: CelebrationFace,
+  confused: ConfusedFace,
+};
+
+// Subtle animations for each state - complements the expressive SVGs
 const stateAnimations: Record<AvatarState, { scale?: number | number[]; rotate?: number[]; y?: number[]; transition: Transition }> = {
   idle: {
-    scale: [1, 1.02, 1],
+    y: [0, -3, 0],
     transition: { duration: 3, repeat: Infinity, ease: "easeInOut" as const },
   },
   listening: {
-    scale: 1.05,
-    rotate: [0, -3, 3, 0],
-    transition: { duration: 0.5 },
+    scale: [1, 1.02, 1],
+    transition: { duration: 2, repeat: Infinity, ease: "easeInOut" as const },
   },
   thinking: {
-    rotate: [0, -5, 0],
-    y: [0, -5, 0],
-    transition: { duration: 2, repeat: Infinity },
+    rotate: [0, -3, 0],
+    y: [0, -4, 0],
+    transition: { duration: 2.5, repeat: Infinity, ease: "easeInOut" as const },
   },
   speaking: {
     scale: [1, 1.03, 1],
-    transition: { duration: 0.3, repeat: Infinity },
+    transition: { duration: 0.6, repeat: Infinity, ease: "easeInOut" as const },
   },
   celebrating: {
-    y: [0, -20, 0],
-    rotate: [0, -10, 10, 0],
-    scale: [1, 1.1, 1],
-    transition: { duration: 0.6, repeat: Infinity },
+    y: [0, -8, 0],
+    scale: [1, 1.05, 1],
+    transition: { duration: 0.8, repeat: Infinity, ease: "easeInOut" as const },
   },
   confused: {
-    rotate: [0, 15, 0],
-    transition: { duration: 1.5, repeat: Infinity },
+    rotate: [0, 5, -5, 0],
+    transition: { duration: 2, repeat: Infinity, ease: "easeInOut" as const },
   },
 };
 
@@ -54,6 +68,7 @@ const PixelAvatar = ({
   className,
 }: PixelAvatarProps) => {
   const animation = stateAnimations[state];
+  const imageSrc = stateImages[state];
   
   return (
     <div className={cn("relative flex flex-col items-center", className)}>
@@ -70,83 +85,18 @@ const PixelAvatar = ({
           sizeClasses[size]
         )}
       >
-        {/* The Pixel Face */}
-        <img
-          src={PixelFace}
-          alt="Pixel the study buddy"
-          className="w-full h-full object-contain"
-        />
-
-        {/* State-specific overlays */}
-        <AnimatePresence>
-          {state === "thinking" && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0 }}
-              className="absolute -top-2 -right-2"
-            >
-              <motion.span
-                animate={{ y: [0, -5, 0] }}
-                transition={{ duration: 1, repeat: Infinity }}
-                className="text-2xl"
-              >
-                🤔
-              </motion.span>
-            </motion.div>
-          )}
-
-          {state === "confused" && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0 }}
-              className="absolute -top-2 -right-2"
-            >
-              <motion.span
-                animate={{ rotate: [0, 15, -15, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="text-2xl"
-              >
-                ❓
-              </motion.span>
-            </motion.div>
-          )}
-
-          {state === "celebrating" && (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute -top-4 left-0"
-              >
-                <motion.span
-                  animate={{ y: [0, -10, 0], rotate: [0, 20, -20, 0] }}
-                  transition={{ duration: 0.5, repeat: Infinity }}
-                  className="text-xl"
-                >
-                  ✨
-                </motion.span>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute -top-4 right-0"
-              >
-                <motion.span
-                  animate={{ y: [0, -10, 0], rotate: [0, -20, 20, 0] }}
-                  transition={{ duration: 0.5, repeat: Infinity, delay: 0.2 }}
-                  className="text-xl"
-                >
-                  ⭐
-                </motion.span>
-              </motion.div>
-            </>
-          )}
-
-
+        {/* Crossfade between mascot SVGs */}
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={state}
+            src={imageSrc}
+            alt="Pixel the study buddy"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.2 }}
+            className="w-full h-full object-contain"
+          />
         </AnimatePresence>
       </motion.div>
     </div>
