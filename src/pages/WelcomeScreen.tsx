@@ -42,7 +42,7 @@ const WelcomeScreen = () => {
               className="w-80 h-auto"
               onLoad={() => {
                 // Start fade-out after GIF plays (adjust timing as needed)
-                setTimeout(() => setShowSplash(false), 2500);
+                setTimeout(() => setShowSplash(false), 3750);
               }}
             />
           </motion.div>
