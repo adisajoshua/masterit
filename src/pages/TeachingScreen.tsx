@@ -145,11 +145,11 @@ const TeachingScreen = () => {
 
         {/* Main content */}
         <div className="flex flex-col lg:flex-row gap-8 mt-28">
-          {/* Avatar section - horizontal on mobile/tablet, vertical on desktop */}
+          {/* Avatar section - vertical stacking on all screen sizes */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="w-full lg:w-1/3 flex flex-row lg:flex-col items-center gap-4"
+            className="w-full lg:w-1/3 flex flex-col items-center gap-4"
           >
             <PixelAvatar state={avatarState} size="teaching" className="flex-shrink-0" animated />
             <MessageBox message={currentQuestion.text} variant="dotted" />
