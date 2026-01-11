@@ -6,6 +6,7 @@ import DefaultFace from "@/assets/mascot/default.svg";
 import ConfusedFace from "@/assets/mascot/confused.svg";
 import CelebrationFace from "@/assets/mascot/celebration.svg";
 import SpeakingFace from "@/assets/mascot/speaking.svg";
+import ThinkingFace from "@/assets/mascot/thinking.svg";
 export type AvatarState = "idle" | "listening" | "thinking" | "speaking" | "celebrating" | "confused";
 interface PixelAvatarProps {
   state?: AvatarState;
@@ -21,8 +22,8 @@ const sizeClasses = {
   lg: "w-40 h-40",
   xl: "w-56 h-56",
   // Custom sizes per screen
-  welcome: "w-[13.5rem] h-[13.5rem]",
-  // 216px (~35% increase from lg)
+  welcome: "w-60 h-60",
+  // 240px (~50% increase from lg)
   setup: "w-48 h-48",
   // 192px (~20% increase from lg)
   teaching: "w-[11.5rem] h-[11.5rem]",
@@ -34,8 +35,7 @@ const sizeClasses = {
 const stateImages: Record<AvatarState, string> = {
   idle: DefaultFace,
   listening: ConfusedFace,
-  thinking: SpeakingFace,
-  // Using speaking.svg for thinking/understanding on setup screens
+  thinking: ThinkingFace,
   speaking: SpeakingFace,
   celebrating: CelebrationFace,
   confused: ConfusedFace
