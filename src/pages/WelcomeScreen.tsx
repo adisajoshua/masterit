@@ -23,37 +23,16 @@ const WelcomeScreen = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col items-center gap-8 max-w-md w-full"
+        className="flex flex-col items-center gap-6 max-w-md w-full"
       >
-        {/* Avatar with greeting */}
-        <div className="flex items-center gap-4">
-          <PixelAvatar
-            state="idle"
-            size="welcome"
-          />
-          <MessageBox
-            message={
-              showInput
-                ? `Nice to meet you${userName ? `, ${userName}` : ""}! Ready to become the teacher?`
-                : "Hey there! I'm Pixel, your study buddy. Teaching me helps YOU learn better!"
-            }
-            variant="dotted"
-          />
-        </div>
-
-        {/* Intro text or input */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="w-full space-y-6"
-        >
-          {!showInput ? (
+        {!showInput ? (
+          <>
+            {/* Heading and subtext ABOVE mascot */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-              className="text-center space-y-4"
+              transition={{ delay: 0.3 }}
+              className="text-center space-y-2"
             >
               <h1 className="text-3xl font-display font-bold text-foreground">
                 Welcome to <span className="text-coral">MasterIt</span>
@@ -61,18 +40,57 @@ const WelcomeScreen = () => {
               <p className="text-muted-foreground">
                 The best way to learn is to teach. Let's get started!
               </p>
+            </motion.div>
+
+            {/* Mascot block - stacked vertically */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5 }}
+              className="flex flex-col items-center gap-4"
+            >
+              <PixelAvatar
+                state="idle"
+                size="welcome"
+              />
+              <MessageBox
+                message="Hey there! I'm Pixel, your study buddy. Teaching me helps YOU learn better!"
+                variant="dotted"
+              />
+            </motion.div>
+
+            {/* CTA button */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+            >
               <NeumorphicButton
                 onClick={() => setShowInput(true)}
-                className="mt-4"
               >
                 Let's Go!
               </NeumorphicButton>
             </motion.div>
-          ) : (
+          </>
+        ) : (
+          <>
+            {/* Mascot block for input state */}
+            <div className="flex flex-col items-center gap-4">
+              <PixelAvatar
+                state="idle"
+                size="welcome"
+              />
+              <MessageBox
+                message={`Nice to meet you${userName ? `, ${userName}` : ""}! Ready to become the teacher?`}
+                variant="dotted"
+              />
+            </div>
+
+            {/* Name input section */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
+              className="w-full space-y-6"
             >
               <div className="text-center">
                 <h2 className="text-xl font-semibold text-foreground mb-2">
@@ -96,8 +114,8 @@ const WelcomeScreen = () => {
                 Continue
               </NeumorphicButton>
             </motion.div>
-          )}
-        </motion.div>
+          </>
+        )}
       </motion.div>
     </div>
   );

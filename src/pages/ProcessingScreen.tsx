@@ -51,7 +51,7 @@ const ProcessingScreen = () => {
       >
         {/* Avatar thinking - centered modal style */}
         <div className="flex items-center gap-4">
-          <PixelAvatar state="thinking" size="lg" />
+          <PixelAvatar state="thinking" size="setup" />
           <MessageBox message="Let me analyze this material... 🧠" variant="dotted" />
         </div>
 
