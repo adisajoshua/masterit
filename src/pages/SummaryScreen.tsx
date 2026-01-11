@@ -92,8 +92,8 @@ const SummaryScreen = () => {
           {/* Avatar celebration */}
           <div className="flex justify-center">
             <PixelAvatar
-              state={currentCycleSummary.masteryPercentage >= 70 ? "celebrating" : "idle"}
-              size="md"
+              state="celebrating"
+              size="lg"
             />
           </div>
 

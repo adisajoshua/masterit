@@ -17,6 +17,12 @@ import { mockCycleSummaries, concepts } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import type { AvatarState } from "@/components/PixelAvatar";
 
+// Determine initial avatar state based on question index
+const getInitialAvatarState = (questionIndex: number): AvatarState => {
+  if (questionIndex < 2) return "confused"; // Q1 and Q2 start with confused
+  return "speaking"; // Q3 starts with speaking/understanding
+};
+
 const TeachingScreen = () => {
   const navigate = useNavigate();
   const {
@@ -32,7 +38,9 @@ const TeachingScreen = () => {
   const [showMaterialModal, setShowMaterialModal] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [inputMode, setInputMode] = useState<"voice" | "text">("voice");
-  const [avatarState, setAvatarState] = useState<AvatarState>("speaking");
+  const [avatarState, setAvatarState] = useState<AvatarState>(() => 
+    getInitialAvatarState(currentQuestionIndex)
+  );
   const [isEvaluating, setIsEvaluating] = useState(false);
 
   const questions = selectedConcept?.questions || [];
@@ -45,14 +53,12 @@ const TeachingScreen = () => {
     }
   }, [selectedConcept, navigate]);
 
+  // Update avatar state when question changes (not on mount)
   useEffect(() => {
-    // Avatar speaks the question
-    setAvatarState("speaking");
-    const timer = setTimeout(() => {
-      setAvatarState("listening");
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [currentQuestionIndex]);
+    if (!isEvaluating) {
+      setAvatarState(getInitialAvatarState(currentQuestionIndex));
+    }
+  }, [currentQuestionIndex, isEvaluating]);
 
   const handleVoiceHold = () => {
     setIsRecording(true);
@@ -65,40 +71,42 @@ const TeachingScreen = () => {
     if (currentQuestion) {
       setAnswer(currentQuestion.expectedAnswer);
     }
+    // Return to current question's default state
+    setAvatarState(getInitialAvatarState(currentQuestionIndex));
   };
 
   const handleSubmit = () => {
     if (!answer.trim()) return;
 
     setIsEvaluating(true);
-    setAvatarState("thinking");
+    setAvatarState("thinking"); // Processing response
 
     // Simulate evaluation
     setTimeout(() => {
       // Award XP
       addXP(25);
-      setAvatarState("celebrating");
 
-      setTimeout(() => {
-        if (currentQuestionIndex < totalQuestions - 1) {
-          // Next question
-          setCurrentQuestionIndex(currentQuestionIndex + 1);
-          setAnswer("");
-          setIsEvaluating(false);
-        } else {
-          // Cycle complete - show summary
-          const summary = mockCycleSummaries[selectedConcept?.id || "natural-selection"];
-          setCurrentCycleSummary(summary);
-          navigate("/summary");
-        }
-      }, 1000);
+      if (currentQuestionIndex < totalQuestions - 1) {
+        // Move to next question
+        const nextIndex = currentQuestionIndex + 1;
+        setCurrentQuestionIndex(nextIndex);
+        setAnswer("");
+        setIsEvaluating(false);
+        // Avatar state will be set by the useEffect based on new question index
+      } else {
+        // Cycle complete - navigate to summary with celebrating mascot
+        const summary = mockCycleSummaries[selectedConcept?.id || "natural-selection"];
+        setCurrentCycleSummary(summary);
+        navigate("/summary");
+      }
     }, 1500);
   };
 
   const handleRestart = () => {
     setCurrentQuestionIndex(0);
     setAnswer("");
-    setAvatarState("speaking");
+    setAvatarState("confused");
+    setIsEvaluating(false);
   };
 
   if (!selectedConcept || !currentQuestion) {
@@ -143,7 +151,7 @@ const TeachingScreen = () => {
             animate={{ opacity: 1, x: 0 }}
             className="w-full lg:w-1/3 flex flex-row lg:flex-col items-center gap-4"
           >
-            <PixelAvatar state={avatarState} size="lg" className="flex-shrink-0" />
+            <PixelAvatar state={avatarState} size="lg" className="flex-shrink-0" animated />
             <MessageBox message={currentQuestion.text} variant="dotted" />
 
             {/* Source material toggle */}

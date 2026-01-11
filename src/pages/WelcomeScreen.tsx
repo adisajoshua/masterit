@@ -28,7 +28,7 @@ const WelcomeScreen = () => {
         {/* Avatar with greeting */}
         <div className="flex items-center gap-4">
           <PixelAvatar
-            state={showInput ? "listening" : "speaking"}
+            state="idle"
             size="lg"
           />
           <MessageBox
