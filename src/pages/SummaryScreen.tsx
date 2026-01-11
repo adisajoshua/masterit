@@ -94,6 +94,12 @@ const SummaryScreen = () => {
             <PixelAvatar
               state="celebrating"
               size="lg"
+              className="md:hidden"
+            />
+            <PixelAvatar
+              state="celebrating"
+              size="summary-web"
+              className="hidden md:block"
             />
           </div>
 

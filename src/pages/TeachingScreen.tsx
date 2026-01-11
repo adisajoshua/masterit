@@ -151,7 +151,7 @@ const TeachingScreen = () => {
             animate={{ opacity: 1, x: 0 }}
             className="w-full lg:w-1/3 flex flex-row lg:flex-col items-center gap-4"
           >
-            <PixelAvatar state={avatarState} size="lg" className="flex-shrink-0" animated />
+            <PixelAvatar state={avatarState} size="teaching" className="flex-shrink-0" animated />
             <MessageBox message={currentQuestion.text} variant="dotted" />
 
             {/* Source material toggle */}

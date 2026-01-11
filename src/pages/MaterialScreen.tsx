@@ -48,7 +48,7 @@ const MaterialScreen = () => {
             transition={{ delay: 0.2 }}
             className="w-full lg:w-1/3 flex flex-row lg:flex-col items-center gap-4 lg:sticky lg:top-8"
           >
-            <PixelAvatar state="thinking" size="lg" className="flex-shrink-0" />
+            <PixelAvatar state="thinking" size="setup" className="flex-shrink-0" />
             <MessageBox 
               message="Paste your study material below. I'll read it and we'll practice together!" 
               variant="dotted"
