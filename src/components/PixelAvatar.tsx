@@ -113,7 +113,7 @@ const PixelAvatar = ({
       scale: animation.scale,
       rotate: animation.rotate,
       y: animation.y
-    }} transition={animation.transition} className={cn("relative flex items-center justify-center", sizeClasses[size])}>
+    }} transition={animation.transition} className={cn("relative flex items-center justify-center overflow-visible", sizeClasses[size])}>
           <AnimatePresence mode="wait">
             <motion.img key={state} src={imageSrc} alt="Pixel the study buddy" initial={{
           opacity: 0,
@@ -126,10 +126,10 @@ const PixelAvatar = ({
           scale: 0.9
         }} transition={{
           duration: 0.2
-        }} className="w-full h-full object-contain" />
+        }} className="w-full h-full object-visible" />
           </AnimatePresence>
-        </motion.div> : <div className={cn("relative flex items-center justify-center", sizeClasses[size])}>
-          <img src={imageSrc} alt="Pixel the study buddy" className="w-full h-full object-cover" />
+        </motion.div> : <div className={cn("relative flex items-center justify-center overflow-visible", sizeClasses[size])}>
+          <img src={imageSrc} alt="Pixel the study buddy" className="w-full h-full" />
         </div>}
     </div>;
 };
