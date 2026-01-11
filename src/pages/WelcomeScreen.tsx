@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import PixelAvatar from "@/components/PixelAvatar";
 import MessageBox from "@/components/ui/MessageBox";
 import NeumorphicButton from "@/components/neumorphic/NeumorphicButton";
 import NeumorphicInput from "@/components/neumorphic/NeumorphicInput";
 import { useApp } from "@/context/AppContext";
+import introSplashGif from "@/assets/intro-splash.gif";
 
 const WelcomeScreen = () => {
   const navigate = useNavigate();
   const { userName, setUserName } = useApp();
+  const [showSplash, setShowSplash] = useState(true);
   const [showInput, setShowInput] = useState(false);
 
   const handleContinue = () => {
@@ -20,11 +22,37 @@ const WelcomeScreen = () => {
 
   return (
     <div className="min-h-screen bg-background grid-bg flex flex-col items-center justify-center p-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col items-center gap-6 max-w-md w-full"
-      >
+      <AnimatePresence mode="wait">
+        {showSplash ? (
+          <motion.div
+            key="splash"
+            initial={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.5 }}
+            onAnimationComplete={(definition) => {
+              if (definition === "exit") setShowSplash(false);
+            }}
+            className="fixed inset-0 flex items-center justify-center bg-background z-50"
+          >
+            <img
+              src={introSplashGif}
+              alt="MasterIt Loading"
+              className="w-80 h-auto"
+              onLoad={() => {
+                // Start fade-out after GIF plays (adjust timing as needed)
+                setTimeout(() => setShowSplash(false), 2500);
+              }}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col items-center gap-6 max-w-md w-full"
+          >
         {!showInput ? (
           <>
             {/* Heading and subtext ABOVE mascot */}
@@ -115,8 +143,10 @@ const WelcomeScreen = () => {
               </NeumorphicButton>
             </motion.div>
           </>
+          )}
+        </motion.div>
         )}
-      </motion.div>
+      </AnimatePresence>
     </div>
   );
 };
