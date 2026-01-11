@@ -33,7 +33,8 @@ const WelcomeScreen = () => {
             onAnimationComplete={(definition) => {
               if (definition === "exit") setShowSplash(false);
             }}
-            className="fixed inset-0 flex items-center justify-center bg-background z-50"
+            className="fixed inset-0 flex items-center justify-center z-50"
+            style={{ backgroundColor: '#FFFAE9' }}
           >
             <img
               src={introSplashGif}
