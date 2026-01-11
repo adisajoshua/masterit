@@ -11,24 +11,29 @@ export type AvatarState = "idle" | "listening" | "thinking" | "speaking" | "cele
 
 interface PixelAvatarProps {
   state?: AvatarState;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "welcome" | "setup" | "teaching" | "summary-web";
   className?: string;
   animated?: boolean;
 }
 
-// Increased sizes by ~15%
+// Screen-specific sizes for different contexts
 const sizeClasses = {
   sm: "w-20 h-20",
   md: "w-28 h-28",
   lg: "w-40 h-40",
   xl: "w-56 h-56",
+  // Custom sizes per screen
+  welcome: "w-[13.5rem] h-[13.5rem]",       // 216px (~35% increase from lg)
+  setup: "w-48 h-48",                        // 192px (~20% increase from lg)
+  teaching: "w-[11.5rem] h-[11.5rem]",       // 184px (~15% increase from lg)
+  "summary-web": "w-44 h-44",                // 176px (~10% increase from lg for web)
 };
 
 // Map each state to its corresponding SVG
 const stateImages: Record<AvatarState, string> = {
   idle: DefaultFace,
   listening: ConfusedFace,
-  thinking: ConfusedFace,
+  thinking: SpeakingFace,  // Using speaking.svg for thinking/understanding on setup screens
   speaking: SpeakingFace,
   celebrating: CelebrationFace,
   confused: ConfusedFace,

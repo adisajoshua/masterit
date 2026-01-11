@@ -44,7 +44,7 @@ const ConceptsScreen = () => {
             transition={{ delay: 0.2 }}
             className="w-full lg:w-1/4 flex flex-row lg:flex-col items-center gap-4 lg:sticky lg:top-8"
           >
-            <PixelAvatar state="thinking" size="lg" className="flex-shrink-0" />
+            <PixelAvatar state="thinking" size="setup" className="flex-shrink-0" />
             <MessageBox
               message={
                 selectedConcept

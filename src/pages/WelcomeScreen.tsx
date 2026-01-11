@@ -29,7 +29,7 @@ const WelcomeScreen = () => {
         <div className="flex items-center gap-4">
           <PixelAvatar
             state="idle"
-            size="lg"
+            size="welcome"
           />
           <MessageBox
             message={
