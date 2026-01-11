@@ -13,13 +13,15 @@ interface PixelAvatarProps {
   state?: AvatarState;
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
+  animated?: boolean;
 }
 
+// Increased sizes by ~15%
 const sizeClasses = {
-  sm: "w-16 h-16",
-  md: "w-24 h-24",
-  lg: "w-32 h-32",
-  xl: "w-48 h-48",
+  sm: "w-20 h-20",
+  md: "w-28 h-28",
+  lg: "w-40 h-40",
+  xl: "w-56 h-56",
 };
 
 // Map each state to its corresponding SVG
@@ -66,39 +68,46 @@ const PixelAvatar = ({
   state = "idle",
   size = "lg",
   className,
+  animated = false,
 }: PixelAvatarProps) => {
   const animation = stateAnimations[state];
   const imageSrc = stateImages[state];
   
   return (
     <div className={cn("relative flex flex-col items-center", className)}>
-      {/* Avatar Container - Gumroad style with border */}
-      <motion.div
-        animate={{
-          scale: animation.scale,
-          rotate: animation.rotate,
-          y: animation.y,
-        }}
-        transition={animation.transition}
-        className={cn(
-          "relative rounded-full bg-surface border border-foreground p-3 flex items-center justify-center",
-          sizeClasses[size]
-        )}
-      >
-        {/* Crossfade between mascot SVGs */}
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={state}
+      {/* Avatar - No container, direct SVG display */}
+      {animated ? (
+        <motion.div
+          animate={{
+            scale: animation.scale,
+            rotate: animation.rotate,
+            y: animation.y,
+          }}
+          transition={animation.transition}
+          className={cn("relative flex items-center justify-center", sizeClasses[size])}
+        >
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={state}
+              src={imageSrc}
+              alt="Pixel the study buddy"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              className="w-full h-full object-contain"
+            />
+          </AnimatePresence>
+        </motion.div>
+      ) : (
+        <div className={cn("relative flex items-center justify-center", sizeClasses[size])}>
+          <img
             src={imageSrc}
             alt="Pixel the study buddy"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.2 }}
             className="w-full h-full object-contain"
           />
-        </AnimatePresence>
-      </motion.div>
+        </div>
+      )}
     </div>
   );
 };
