@@ -133,7 +133,7 @@ const TeachingScreen = () => {
               {selectedConcept.title}
             </span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between sm:justify-end gap-4 flex-1 sm:flex-none">
             <ProgressBar
               current={currentQuestionIndex + 1}
               total={totalQuestions}
