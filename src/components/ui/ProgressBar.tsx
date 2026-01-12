@@ -31,11 +31,6 @@ const ProgressBar = ({
     
   const filledSegments = Math.ceil((percentage / 100) * segments);
   
-  const getColor = (percent: number) => {
-    if (percent >= 80) return "bg-accent-teal";
-    if (percent >= 50) return "bg-accent-yellow";
-    return "bg-primary";
-  };
   
   const sizes = {
     sm: "h-2",
@@ -54,7 +49,7 @@ const ProgressBar = ({
             key={i}
             className={cn(
               "flex-1 rounded-sm transition-colors duration-300",
-              i < filledSegments ? getColor(percentage) : "bg-muted"
+              i < filledSegments ? "bg-foreground" : "bg-muted"
             )}
             initial={animated ? { scaleY: 0 } : false}
             animate={{ scaleY: 1 }}

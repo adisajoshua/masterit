@@ -127,7 +127,7 @@ const ConceptsScreen = () => {
                         </div>
                         <div className="mt-1 h-1.5 bg-muted rounded-full overflow-hidden">
                           <motion.div
-                            className="h-full bg-gradient-to-r from-coral to-turquoise"
+                            className="h-full bg-foreground"
                             initial={{ width: 0 }}
                             animate={{ width: `${concept.mastery}%` }}
                             transition={{ delay: 0.6 + index * 0.1, duration: 0.5 }}

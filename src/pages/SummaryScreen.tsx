@@ -143,7 +143,7 @@ const SummaryScreen = () => {
             </div>
             <div className="h-4 bg-muted rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-gradient-to-r from-coral via-turquoise to-sky"
+                className="h-full bg-foreground"
                 initial={{ width: 0 }}
                 animate={{ width: `${animatedMastery}%` }}
                 transition={{ duration: 1, ease: "easeOut" }}
