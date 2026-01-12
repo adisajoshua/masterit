@@ -6,8 +6,10 @@ import DefaultFace from "@/assets/mascot/default.svg";
 import ConfusedFace from "@/assets/mascot/confused.svg";
 import CelebrationFace from "@/assets/mascot/celebration.svg";
 import SpeakingFace from "@/assets/mascot/speaking.svg";
-import ThinkingFace from "@/assets/mascot/thinking.svg";
+import ThinkingMascot from "@/components/ThinkingMascot";
+
 export type AvatarState = "idle" | "listening" | "thinking" | "speaking" | "celebrating" | "confused";
+
 interface PixelAvatarProps {
   state?: AvatarState;
   size?: "sm" | "md" | "lg" | "xl" | "welcome" | "setup" | "teaching" | "summary-web";
@@ -31,11 +33,10 @@ const sizeClasses = {
   "summary-web": "w-44 h-44" // 176px (~10% increase from lg for web)
 };
 
-// Map each state to its corresponding SVG
-const stateImages: Record<AvatarState, string> = {
+// Map each state to its corresponding SVG (excluding thinking which uses inline component)
+const stateImages: Record<Exclude<AvatarState, "thinking">, string> = {
   idle: DefaultFace,
   listening: ConfusedFace,
-  thinking: ThinkingFace,
   speaking: SpeakingFace,
   celebrating: CelebrationFace,
   confused: ConfusedFace
@@ -105,32 +106,51 @@ const PixelAvatar = ({
   className,
   animated = false
 }: PixelAvatarProps) => {
+  // Use inline ThinkingMascot component for thinking state (animates only the thought bubble)
+  if (state === "thinking") {
+    return (
+      <div className={cn("relative flex flex-col items-center", className)}>
+        <div className={cn("relative flex items-center justify-center overflow-visible", sizeClasses[size])}>
+          <ThinkingMascot animated={animated} />
+        </div>
+      </div>
+    );
+  }
+
   const animation = stateAnimations[state];
   const imageSrc = stateImages[state];
-  return <div className={cn("relative flex flex-col items-center", className)}>
-      {/* Avatar - No container, direct SVG display */}
-      {animated ? <motion.div animate={{
-      scale: animation.scale,
-      rotate: animation.rotate,
-      y: animation.y
-    }} transition={animation.transition} className={cn("relative flex items-center justify-center overflow-visible", sizeClasses[size])}>
+  
+  return (
+    <div className={cn("relative flex flex-col items-center", className)}>
+      {animated ? (
+        <motion.div
+          animate={{
+            scale: animation.scale,
+            rotate: animation.rotate,
+            y: animation.y
+          }}
+          transition={animation.transition}
+          className={cn("relative flex items-center justify-center overflow-visible", sizeClasses[size])}
+        >
           <AnimatePresence mode="wait">
-            <motion.img key={state} src={imageSrc} alt="Pixel the study buddy" initial={{
-          opacity: 0,
-          scale: 0.9
-        }} animate={{
-          opacity: 1,
-          scale: 1
-        }} exit={{
-          opacity: 0,
-          scale: 0.9
-        }} transition={{
-          duration: 0.2
-        }} className="w-full h-full object-visible" />
+            <motion.img
+              key={state}
+              src={imageSrc}
+              alt="Pixel the study buddy"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              className="w-full h-full object-visible"
+            />
           </AnimatePresence>
-        </motion.div> : <div className={cn("relative flex items-center justify-center overflow-visible", sizeClasses[size])}>
+        </motion.div>
+      ) : (
+        <div className={cn("relative flex items-center justify-center overflow-visible", sizeClasses[size])}>
           <img src={imageSrc} alt="Pixel the study buddy" className="w-full h-full object-contain" />
-        </div>}
-    </div>;
+        </div>
+      )}
+    </div>
+  );
 };
 export default PixelAvatar;
