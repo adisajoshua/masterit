@@ -41,7 +41,7 @@ const SourceMaterialModal = ({
             </DialogTitle>
           </div>
           <DialogClose className="absolute right-4 top-4 w-8 h-8 rounded-lg border border-foreground/20 flex items-center justify-center hover:bg-muted transition-colors">
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </DialogClose>
         </DialogHeader>
 
