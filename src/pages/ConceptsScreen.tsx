@@ -83,11 +83,11 @@ const ConceptsScreen = () => {
                     transition={{ delay: 0.4 + index * 0.1 }}
                   >
                     <NeumorphicCard
-                      selected={selectedConcept?.id === concept.id}
-                      onClick={() => setSelectedConcept(concept)}
+                      selected={selectedConcept?.id === concept.id && !isCompleted}
+                      onClick={isCompleted ? undefined : () => setSelectedConcept(concept)}
                       className={cn(
                         "h-full",
-                        isCompleted && "opacity-60"
+                        isCompleted && "opacity-50 pointer-events-none cursor-not-allowed"
                       )}
                     >
                       {/* Confidence stars */}
@@ -121,25 +121,23 @@ const ConceptsScreen = () => {
                           <span className="text-muted-foreground">
                             Mastery
                           </span>
-                          <span className="font-mono text-coral">
-                            {concept.mastery}%
+                          <span className={cn(
+                            "font-mono",
+                            isCompleted ? "text-foreground" : "text-coral"
+                          )}>
+                            {isCompleted ? "Completed" : `${concept.mastery}%`}
                           </span>
                         </div>
                         <div className="mt-1 h-1.5 bg-muted rounded-full overflow-hidden">
                           <motion.div
                             className="h-full bg-foreground"
                             initial={{ width: 0 }}
-                            animate={{ width: `${concept.mastery}%` }}
+                            animate={{ width: isCompleted ? "100%" : `${concept.mastery}%` }}
                             transition={{ delay: 0.6 + index * 0.1, duration: 0.5 }}
                           />
                         </div>
                       </div>
 
-                      {isCompleted && (
-                        <div className="absolute top-2 right-2 text-turquoise text-xs font-medium">
-                          ✓ Done
-                        </div>
-                      )}
                     </NeumorphicCard>
                   </motion.div>
                 );
