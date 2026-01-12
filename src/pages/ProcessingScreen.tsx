@@ -130,7 +130,7 @@ const ProcessingScreen = () => {
         >
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-coral to-turquoise"
+              className="h-full bg-foreground"
               initial={{ width: "0%" }}
               animate={{
                 width: `${((completedSteps.length) / steps.length) * 100}%`,
