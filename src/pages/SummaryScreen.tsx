@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Check, AlertCircle, Flame, ArrowRight, RotateCcw, BookOpen } from "lucide-react";
+import { Check, AlertCircle, Flame } from "lucide-react";
 import PixelAvatar from "@/components/PixelAvatar";
 import NeumorphicButton from "@/components/neumorphic/NeumorphicButton";
 import Confetti from "@/components/ui/Confetti";
@@ -216,7 +216,6 @@ const SummaryScreen = () => {
               variant="outline"
               className="w-full"
             >
-              <RotateCcw className="w-4 h-4 mr-2" />
               Deeper Dive
             </NeumorphicButton>
 
@@ -225,7 +224,6 @@ const SummaryScreen = () => {
               variant="primary"
               className="w-full"
             >
-              <ArrowRight className="w-4 h-4 mr-2" />
               Next Topic
             </NeumorphicButton>
 
@@ -234,7 +232,6 @@ const SummaryScreen = () => {
               variant="outline"
               className="w-full"
             >
-              <BookOpen className="w-4 h-4 mr-2" />
               Review All
             </NeumorphicButton>
           </div>
