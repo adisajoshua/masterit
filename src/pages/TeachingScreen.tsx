@@ -22,7 +22,6 @@ const getInitialAvatarState = (questionIndex: number): AvatarState => {
   if (questionIndex < 2) return "confused"; // Q1 and Q2 start with confused
   return "speaking"; // Q3 starts with speaking/understanding
 };
-
 const TeachingScreen = () => {
   const navigate = useNavigate();
   const {
@@ -31,22 +30,17 @@ const TeachingScreen = () => {
     setCurrentQuestionIndex,
     totalXP,
     addXP,
-    setCurrentCycleSummary,
+    setCurrentCycleSummary
   } = useApp();
-
   const [answer, setAnswer] = useState("");
   const [showMaterialModal, setShowMaterialModal] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [inputMode, setInputMode] = useState<"voice" | "text">("voice");
-  const [avatarState, setAvatarState] = useState<AvatarState>(() => 
-    getInitialAvatarState(currentQuestionIndex)
-  );
+  const [avatarState, setAvatarState] = useState<AvatarState>(() => getInitialAvatarState(currentQuestionIndex));
   const [isEvaluating, setIsEvaluating] = useState(false);
-
   const questions = selectedConcept?.questions || [];
   const currentQuestion = questions[currentQuestionIndex];
   const totalQuestions = questions.length;
-
   useEffect(() => {
     if (!selectedConcept) {
       navigate("/concepts");
@@ -59,12 +53,10 @@ const TeachingScreen = () => {
       setAvatarState(getInitialAvatarState(currentQuestionIndex));
     }
   }, [currentQuestionIndex, isEvaluating]);
-
   const handleVoiceHold = () => {
     setIsRecording(true);
     setAvatarState("listening");
   };
-
   const handleVoiceRelease = () => {
     setIsRecording(false);
     // Simulate transcription with expected answer
@@ -74,10 +66,8 @@ const TeachingScreen = () => {
     // Return to current question's default state
     setAvatarState(getInitialAvatarState(currentQuestionIndex));
   };
-
   const handleSubmit = () => {
     if (!answer.trim()) return;
-
     setIsEvaluating(true);
     setAvatarState("thinking"); // Processing response
 
@@ -85,7 +75,6 @@ const TeachingScreen = () => {
     setTimeout(() => {
       // Award XP
       addXP(25);
-
       if (currentQuestionIndex < totalQuestions - 1) {
         // Move to next question
         const nextIndex = currentQuestionIndex + 1;
@@ -101,32 +90,29 @@ const TeachingScreen = () => {
       }
     }, 1500);
   };
-
   const handleRestart = () => {
     setCurrentQuestionIndex(0);
     setAnswer("");
     setAvatarState("confused");
     setIsEvaluating(false);
   };
-
   if (!selectedConcept || !currentQuestion) {
     return null;
   }
-
-  return (
-    <div className="min-h-screen bg-background grid-bg">
-      <BackNavigation
-        backTo="/concepts"
-        backLabel="Back to Concepts"
-        rightAction={{ label: "Restart", onClick: handleRestart }}
-      />
+  return <div className="min-h-screen bg-background grid-bg">
+      <BackNavigation backTo="/concepts" backLabel="Back to Concepts" rightAction={{
+      label: "Restart",
+      onClick: handleRestart
+    }} />
       <div className="container mx-auto px-4 py-6 max-w-5xl">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap items-center justify-between gap-4 mb-6"
-        >
+        <motion.div initial={{
+        opacity: 0,
+        y: -20
+      }} animate={{
+        opacity: 1,
+        y: 0
+      }} className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4">
             <ModeChip mode="teaching" />
             <span className="text-sm text-muted-foreground">
@@ -134,11 +120,7 @@ const TeachingScreen = () => {
             </span>
           </div>
           <div className="flex items-center justify-between sm:justify-end gap-4 flex-1 sm:flex-none">
-            <ProgressBar
-              current={currentQuestionIndex + 1}
-              total={totalQuestions}
-              className="w-32"
-            />
+            <ProgressBar current={currentQuestionIndex + 1} total={totalQuestions} className="w-32" />
             <XPCounter value={totalXP} />
           </div>
         </motion.div>
@@ -146,134 +128,80 @@ const TeachingScreen = () => {
         {/* Main content */}
         <div className="flex flex-col lg:flex-row gap-8 mt-28">
           {/* Avatar section - vertical stacking on all screen sizes */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="w-full lg:w-1/3 flex flex-col items-center gap-4"
-          >
+          <motion.div initial={{
+          opacity: 0,
+          x: -20
+        }} animate={{
+          opacity: 1,
+          x: 0
+        }} className="w-full lg:w-1/3 flex flex-col items-center gap-4">
             <PixelAvatar state={avatarState} size="teaching" className="flex-shrink-0" animated />
             <MessageBox message={currentQuestion.text} variant="dotted" />
 
             {/* Source material toggle */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setShowMaterialModal(true)}
-              className="mt-4 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <motion.button whileHover={{
+            scale: 1.02
+          }} whileTap={{
+            scale: 0.98
+          }} onClick={() => setShowMaterialModal(true)} className="mt-4 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
               <Eye className="w-4 h-4" />
               Show source material
             </motion.button>
 
             {/* Source Material Modal */}
-            <SourceMaterialModal
-              isOpen={showMaterialModal}
-              onClose={() => setShowMaterialModal(false)}
-              concepts={concepts}
-              activeConceptId={selectedConcept.id}
-            />
+            <SourceMaterialModal isOpen={showMaterialModal} onClose={() => setShowMaterialModal(false)} concepts={concepts} activeConceptId={selectedConcept.id} />
           </motion.div>
 
           {/* Answer section */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="lg:w-2/3 space-y-6"
-          >
+          <motion.div initial={{
+          opacity: 0,
+          x: 20
+        }} animate={{
+          opacity: 1,
+          x: 0
+        }} className="lg:w-2/3 space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-display font-semibold text-foreground">
                 Your Explanation
               </h2>
               <div className="flex gap-2">
-                <NeumorphicButton
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setInputMode("voice")}
-                  className={cn(
-                    "w-10 h-10 p-0 flex items-center justify-center",
-                    inputMode === "voice" && "border-primary bg-primary/10"
-                  )}
-                >
+                <NeumorphicButton size="sm" variant="outline" onClick={() => setInputMode("voice")} className={cn("w-10 h-10 p-0 flex items-center justify-center", inputMode === "voice" && "border-primary bg-primary/10")}>
                   <Mic className="w-4 h-4" />
                 </NeumorphicButton>
-                <NeumorphicButton
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setInputMode("text")}
-                  className={cn(
-                    "w-10 h-10 p-0 flex items-center justify-center",
-                    inputMode === "text" && "border-primary bg-primary/10"
-                  )}
-                >
+                <NeumorphicButton size="sm" variant="outline" onClick={() => setInputMode("text")} className={cn("w-10 h-10 p-0 flex items-center justify-center", inputMode === "text" && "border-primary bg-primary/10")}>
                   <Keyboard className="w-4 h-4" />
                 </NeumorphicButton>
               </div>
             </div>
 
             {/* Sticky note style answer area */}
-            <div
-              className={cn(
-                "relative rounded-2xl p-6 min-h-[200px] transition-all duration-300",
-                "bg-gold/10 border-2 border-dashed border-gold/30",
-                "shadow-[4px_4px_0_0_hsl(var(--gold)/0.2)]"
-              )}
-              style={{ fontFamily: "var(--font-handwritten)" }}
-            >
-              {inputMode === "voice" ? (
-                <div className="flex flex-col items-center justify-center h-full min-h-[150px] gap-4">
-                  {isRecording ? (
-                    <>
+            <div className={cn("relative rounded-2xl p-6 min-h-[200px] transition-all duration-300", "bg-gold/10 border-2 border-dashed border-gold/30", "shadow-[4px_4px_0_0_hsl(var(--gold)/0.2)]")} style={{
+            fontFamily: "var(--font-handwritten)"
+          }}>
+              {inputMode === "voice" ? <div className="flex flex-col items-center justify-center h-full min-h-[150px] gap-4">
+                  {isRecording ? <>
                       <Waveform active />
                       <p className="text-coral font-medium">Listening...</p>
-                    </>
-                  ) : answer ? (
-                    <p className="text-lg text-foreground leading-relaxed">
+                    </> : answer ? <p className="text-lg text-foreground leading-relaxed">
                       {answer}
-                    </p>
-                  ) : (
-                    <p className="text-muted-foreground text-center">
+                    </p> : <p className="text-muted-foreground text-center">
                       Hold the microphone button to record your explanation
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <NeumorphicTextArea
-                  placeholder="Type your explanation here..."
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  rows={6}
-                  className="bg-transparent border-none shadow-none text-lg"
-                  style={{ fontFamily: "var(--font-handwritten)" }}
-                />
-              )}
+                    </p>}
+                </div> : <NeumorphicTextArea placeholder="Type your explanation here..." value={answer} onChange={e => setAnswer(e.target.value)} rows={6} className="bg-transparent border-none shadow-none text-lg" style={{
+              fontFamily: "var(--font-handwritten)"
+            }} />}
             </div>
 
             {/* Action buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              {inputMode === "voice" && (
-                <NeumorphicButton
-                  onMouseDown={handleVoiceHold}
-                  onMouseUp={handleVoiceRelease}
-                  onMouseLeave={() => isRecording && handleVoiceRelease()}
-                  onTouchStart={handleVoiceHold}
-                  onTouchEnd={handleVoiceRelease}
-                  variant="outline"
-                  className="flex-1 relative"
-                  disabled={isEvaluating}
-                >
-                  <Mic className="w-5 h-5 absolute left-4" />
+              {inputMode === "voice" && <NeumorphicButton onMouseDown={handleVoiceHold} onMouseUp={handleVoiceRelease} onMouseLeave={() => isRecording && handleVoiceRelease()} onTouchStart={handleVoiceHold} onTouchEnd={handleVoiceRelease} variant="outline" className="flex-1 relative" disabled={isEvaluating}>
+                  <Mic className="absolute left-4 w-4 h-4" />
                   <span className="w-full text-center">
                     {isRecording ? "Recording..." : "Hold to Speak"}
                   </span>
-                </NeumorphicButton>
-              )}
+                </NeumorphicButton>}
 
-              <NeumorphicButton
-                onClick={handleSubmit}
-                disabled={!answer.trim() || isEvaluating}
-                variant="primary"
-                className="flex-1 flex items-center justify-center"
-              >
+              <NeumorphicButton onClick={handleSubmit} disabled={!answer.trim() || isEvaluating} variant="primary" className="flex-1 flex items-center justify-center">
                 {isEvaluating ? "Evaluating..." : "Submit Answer"}
               </NeumorphicButton>
             </div>
@@ -285,8 +213,6 @@ const TeachingScreen = () => {
           </motion.div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default TeachingScreen;
