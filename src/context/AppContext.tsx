@@ -9,6 +9,7 @@ interface AppState {
   totalXP: number;
   addXP: (amount: number) => void;
   concepts: Concept[];
+  setConcepts: (concepts: Concept[]) => void;
   selectedConcept: Concept | null;
   setSelectedConcept: (concept: Concept | null) => void;
   currentQuestionIndex: number;
@@ -26,7 +27,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [userName, setUserName] = useState("");
   const [studyMaterial, setStudyMaterial] = useState("");
   const [totalXP, setTotalXP] = useState(0);
-  const [concepts] = useState<Concept[]>(mockSession.concepts);
+  const [concepts, setConcepts] = useState<Concept[]>(mockSession.concepts);
   const [selectedConcept, setSelectedConcept] = useState<Concept | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentCycleSummary, setCurrentCycleSummary] = useState<CycleSummary | null>(null);
@@ -62,6 +63,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         totalXP,
         addXP,
         concepts,
+        setConcepts, // Added setter
         selectedConcept,
         setSelectedConcept,
         currentQuestionIndex,

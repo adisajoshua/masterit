@@ -6,11 +6,14 @@ import PixelAvatar from "@/components/PixelAvatar";
 import MessageBox from "@/components/ui/MessageBox";
 import LoadingDots from "@/components/ui/LoadingDots";
 import { cn } from "@/lib/utils";
+import { useApp } from "@/context/AppContext";
+import { RealAdaptiveService, USE_REAL_AI } from "@/services/ai/RealAdaptiveService";
+import { Concept } from "@/data/mockData";
 
 interface ProcessingStep {
   id: string;
   label: string;
-  duration: number;
+  duration: number; // Minimum duration for effect
 }
 
 const steps: ProcessingStep[] = [
@@ -21,26 +24,84 @@ const steps: ProcessingStep[] = [
 
 const ProcessingScreen = () => {
   const navigate = useNavigate();
+  const { studyMaterial, setConcepts } = useApp();
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (currentStep < steps.length) {
-      const timer = setTimeout(() => {
-        setCompletedSteps((prev) => [...prev, steps[currentStep].id]);
-        setCurrentStep((prev) => prev + 1);
-      }, steps[currentStep].duration);
+    let isMounted = true;
 
-      return () => clearTimeout(timer);
-    } else {
-      // All steps complete, navigate after a short delay
-      const timer = setTimeout(() => {
-        navigate("/concepts");
-      }, 800);
+    const processMaterial = async () => {
+      try {
+        // Step 1: Reading
+        setCurrentStep(0);
+        await new Promise(r => setTimeout(r, 1500));
+        setCompletedSteps(prev => [...prev, "reading"]);
 
-      return () => clearTimeout(timer);
-    }
-  }, [currentStep, navigate]);
+        if (USE_REAL_AI && studyMaterial.length > 50) {
+          // Step 2: Concepts & Plan (Parallel-ish)
+          setCurrentStep(1);
+
+          // Call API
+          const result = await RealAdaptiveService.generateCurriculum(studyMaterial);
+
+          if (!isMounted) return;
+
+          // Artificial delay to show "Finding Key Concepts"
+          await new Promise(r => setTimeout(r, 1000));
+          setCompletedSteps(prev => [...prev, "concepts"]);
+
+          setCurrentStep(2);
+          // Artificial delay for "Building Plan"
+          await new Promise(r => setTimeout(r, 1000));
+          setCompletedSteps(prev => [...prev, "plan"]);
+
+          // Update Context
+          if (result.concepts && Array.isArray(result.concepts)) {
+            // Cast or map to verify type safety if needed
+            setConcepts(result.concepts as unknown as Concept[]);
+          }
+
+          // Done
+          setTimeout(() => navigate("/concepts"), 500);
+
+        } else {
+          // Fallback / Mock Mode
+          // Perform distinct steps for "Look and Feel"
+          setCurrentStep(1);
+          await new Promise(r => setTimeout(r, 2000));
+          setCompletedSteps(prev => [...prev, "concepts"]);
+
+          setCurrentStep(2);
+          await new Promise(r => setTimeout(r, 1500));
+          setCompletedSteps(prev => [...prev, "plan"]);
+
+          setTimeout(() => navigate("/concepts"), 800);
+        }
+
+      } catch (err) {
+        console.error("Processing failed", err);
+        setError("I had trouble reading that. Please try again.");
+      }
+    };
+
+    processMaterial();
+
+    return () => { isMounted = false; };
+  }, [navigate, studyMaterial, setConcepts]);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-6">
+        <div className="text-center">
+          <PixelAvatar state="confused" size="setup" />
+          <p className="text-destructive font-bold mt-4">{error}</p>
+          <button onClick={() => navigate('/material')} className="mt-4 underline">Try Again</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-6">

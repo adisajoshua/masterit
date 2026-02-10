@@ -61,6 +61,25 @@ export class RealAdaptiveService {
         }
     }
 
+    /**
+     * Calls the Vercel Function to generate a curriculum from text
+     */
+    static async generateCurriculum(text: string) {
+        try {
+            const response = await fetch('/api/generate-concepts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text }),
+            });
+
+            if (!response.ok) throw new Error('Curriculum Generation Failed');
+            return await response.json();
+        } catch (error) {
+            console.error("Curriculum Gen Error", error);
+            throw error;
+        }
+    }
+
     // --- Public Methods matching SimulatedAdaptiveService signature ---
 
     static async analyzeDiagnostic(response: string, conceptId: string) {
