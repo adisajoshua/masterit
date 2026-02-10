@@ -17,6 +17,27 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@MasterItStudio" />
   <meta name="twitter:image" content="/og-image.png" />
+  <script>
+    window.onerror = function (msg, url, line, col, error) {
+      var root = document.getElementById("root");
+      if (root) {
+        root.innerHTML = "<div style='color:red;padding:20px;font-family:monospace;white-space:pre-wrap;'>" +
+          "ReferenceError: " + msg + "\n" +
+          "Url: " + url + "\n" +
+          "Line: " + line + ":" + col + "\n" +
+          (error ? error.stack : "") +
+          "</div>";
+      }
+    };
+    window.addEventListener('unhandledrejection', function (event) {
+      var root = document.getElementById("root");
+      if (root) {
+        root.innerHTML += "<div style='color:orange;padding:20px;font-family:monospace;white-space:pre-wrap;'>" +
+          "Promise Rejection: " + (event.reason ? event.reason.toString() : "Unknown") +
+          "</div>";
+      }
+    });
+  </script>
 </head>
 
 <body>
