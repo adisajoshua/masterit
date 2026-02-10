@@ -1,24 +1,40 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import PixelAvatar from "@/components/PixelAvatar";
 import MessageBox from "@/components/ui/MessageBox";
-import NeumorphicButton from "@/components/neumorphic/NeumorphicButton";
-import NeumorphicCard from "@/components/neumorphic/NeumorphicCard";
+import RetroButton from "@/components/retro-ui/RetroButton";
+import RetroCard from "@/components/retro-ui/RetroCard";
 import ModeChip from "@/components/ui/ModeChip";
 import XPCounter from "@/components/ui/XPCounter";
 import BackNavigation from "@/components/ui/BackNavigation";
 import { useApp } from "@/context/AppContext";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { SubConceptSelector } from "@/components/adaptive/SubConceptSelector";
 
 const ConceptsScreen = () => {
   const navigate = useNavigate();
   const { concepts, selectedConcept, setSelectedConcept, totalXP, completedConcepts } = useApp();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [targetedSubConcept, setTargetedSubConcept] = useState<string | null>(null);
 
-  const handleTeach = () => {
-    if (selectedConcept) {
-      navigate("/teaching");
-    }
+  const handleConceptSelect = (concept: any) => {
+    if (completedConcepts.includes(concept.id)) return;
+    setSelectedConcept(concept);
+    setIsDialogOpen(true);
+  };
+
+  const handleStartSession = () => {
+    setIsDialogOpen(false);
+    navigate("/teaching");
   };
 
   return (
@@ -74,7 +90,7 @@ const ConceptsScreen = () => {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {concepts.map((concept, index) => {
                 const isCompleted = completedConcepts.includes(concept.id);
-                
+
                 return (
                   <motion.div
                     key={concept.id}
@@ -82,9 +98,9 @@ const ConceptsScreen = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 + index * 0.1 }}
                   >
-                    <NeumorphicCard
+                    <RetroCard
                       selected={selectedConcept?.id === concept.id && !isCompleted}
-                      onClick={isCompleted ? undefined : () => setSelectedConcept(concept)}
+                      onClick={() => handleConceptSelect(concept)}
                       className={cn(
                         "h-full",
                         isCompleted && "opacity-50 pointer-events-none cursor-not-allowed"
@@ -138,31 +154,36 @@ const ConceptsScreen = () => {
                         </div>
                       </div>
 
-                    </NeumorphicCard>
+                    </RetroCard>
                   </motion.div>
                 );
               })}
             </div>
-
-            {/* Action button */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="flex justify-center pt-4"
-            >
-              <NeumorphicButton
-                onClick={handleTeach}
-                disabled={!selectedConcept}
-                variant="primary"
-                size="lg"
-              >
-                🎓 Teach This!
-              </NeumorphicButton>
-            </motion.div>
           </motion.div>
         </div>
       </div>
+
+      {/* Drill-Down Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+
+          {selectedConcept && (
+            <SubConceptSelector
+              concept={selectedConcept}
+              onSelect={setTargetedSubConcept}
+            />
+          )}
+
+          <div className="flex justify-end mt-6 gap-3">
+            <RetroButton variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </RetroButton>
+            <RetroButton variant="primary" onClick={handleStartSession}>
+              Start Teaching
+            </RetroButton>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

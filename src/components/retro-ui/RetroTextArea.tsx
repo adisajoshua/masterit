@@ -1,17 +1,17 @@
 import { forwardRef, useState, TextareaHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
-interface NeumorphicTextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+interface RetroTextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   showCount?: boolean;
 }
 
-const NeumorphicTextArea = forwardRef<HTMLTextAreaElement, NeumorphicTextAreaProps>(
+const RetroTextArea = forwardRef<HTMLTextAreaElement, RetroTextAreaProps>(
   ({ className, label, showCount, maxLength, value, ...props }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
     const charCount = typeof value === 'string' ? value.length : 0;
     const charPercentage = maxLength ? (charCount / maxLength) * 100 : 0;
-    
+
     return (
       <div className="relative w-full">
         {label && (
@@ -40,9 +40,9 @@ const NeumorphicTextArea = forwardRef<HTMLTextAreaElement, NeumorphicTextAreaPro
             <div className="absolute bottom-3 right-4 flex items-center gap-2">
               <span className={cn(
                 "text-micro font-mono-display transition-colors",
-                charPercentage > 90 ? "text-alert" : 
-                charPercentage > 70 ? "text-accent-coral" : 
-                "text-muted-foreground"
+                charPercentage > 90 ? "text-alert" :
+                  charPercentage > 70 ? "text-accent-coral" :
+                    "text-muted-foreground"
               )}>
                 {charCount.toLocaleString()}/{maxLength.toLocaleString()}
               </span>
@@ -54,6 +54,6 @@ const NeumorphicTextArea = forwardRef<HTMLTextAreaElement, NeumorphicTextAreaPro
   }
 );
 
-NeumorphicTextArea.displayName = "NeumorphicTextArea";
+RetroTextArea.displayName = "RetroTextArea";
 
-export default NeumorphicTextArea;
+export default RetroTextArea;

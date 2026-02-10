@@ -2,9 +2,9 @@ import { forwardRef } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-interface NeumorphicButtonProps {
+interface RetroButtonProps {
   variant?: "primary" | "outline" | "ghost";
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "icon";
   isLoading?: boolean;
   disabled?: boolean;
   className?: string;
@@ -18,44 +18,45 @@ interface NeumorphicButtonProps {
   type?: "button" | "submit" | "reset";
 }
 
-const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
-  ({ 
-    className, 
-    variant = "primary", 
-    size = "md", 
-    isLoading, 
-    disabled, 
-    children, 
-    onClick, 
+const RetroButton = forwardRef<HTMLButtonElement, RetroButtonProps>(
+  ({
+    className,
+    variant = "primary",
+    size = "md",
+    isLoading,
+    disabled,
+    children,
+    onClick,
     onMouseDown,
     onMouseUp,
     onMouseLeave,
     onTouchStart,
     onTouchEnd,
-    type = "button" 
+    type = "button"
   }, ref) => {
     const isDisabled = disabled || isLoading;
-    
+
     // Offset class goes on WRAPPER, not face
     const offsetClass = {
       primary: "offset-pink",
       outline: "offset-dark",
       ghost: "",
     }[variant];
-    
+
     // Face styles (background, border, text)
     const faceStyles = {
       primary: "bg-[hsl(var(--accent-yellow))] text-foreground border border-foreground",
       outline: "bg-surface text-foreground border border-foreground",
       ghost: "bg-transparent text-foreground border border-transparent hover:border-foreground",
     }[variant];
-    
+
     const sizes = {
       sm: "px-4 py-2 text-small",
       md: "px-6 py-3 text-body",
       lg: "px-8 py-4 text-h3",
+      icon: "h-10 w-10 p-0",
     };
-    
+
     return (
       // WRAPPER - stationary, owns offset pseudo-element
       <div
@@ -97,7 +98,9 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
               <span>Loading...</span>
             </span>
           ) : (
-            children
+            <span className="flex items-center justify-center gap-2">
+              {children}
+            </span>
           )}
         </motion.button>
       </div>
@@ -105,6 +108,6 @@ const NeumorphicButton = forwardRef<HTMLButtonElement, NeumorphicButtonProps>(
   }
 );
 
-NeumorphicButton.displayName = "NeumorphicButton";
+RetroButton.displayName = "RetroButton";
 
-export default NeumorphicButton;
+export default RetroButton;

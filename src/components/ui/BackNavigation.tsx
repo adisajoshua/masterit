@@ -5,13 +5,10 @@ import { motion } from "framer-motion";
 interface BackNavigationProps {
   backTo: string;
   backLabel: string;
-  rightAction?: {
-    label: string;
-    onClick: () => void;
-  };
+  rightContent?: React.ReactNode;
 }
 
-const BackNavigation = ({ backTo, backLabel, rightAction }: BackNavigationProps) => {
+const BackNavigation = ({ backTo, backLabel, rightContent }: BackNavigationProps) => {
   const navigate = useNavigate();
 
   return (
@@ -29,13 +26,10 @@ const BackNavigation = ({ backTo, backLabel, rightAction }: BackNavigationProps)
           <span>{backLabel}</span>
         </button>
 
-        {rightAction && (
-          <button
-            onClick={rightAction.onClick}
-            className="text-sm text-coral hover:underline transition-all duration-200"
-          >
-            {rightAction.label}
-          </button>
+        {rightContent && (
+          <div className="flex items-center gap-4">
+            {rightContent}
+          </div>
         )}
       </div>
     </motion.div>

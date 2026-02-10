@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import PixelAvatar from "@/components/PixelAvatar";
 import MessageBox from "@/components/ui/MessageBox";
-import NeumorphicButton from "@/components/neumorphic/NeumorphicButton";
-import NeumorphicTextArea from "@/components/neumorphic/NeumorphicTextArea";
+import RetroButton from "@/components/retro-ui/RetroButton";
+import RetroTextArea from "@/components/retro-ui/RetroTextArea";
 import ModeChip from "@/components/ui/ModeChip";
 import BackNavigation from "@/components/ui/BackNavigation";
 import { useApp } from "@/context/AppContext";
@@ -12,15 +13,17 @@ import { mockSession } from "@/data/mockData";
 const MaterialScreen = () => {
   const navigate = useNavigate();
   const { userName, studyMaterial, setStudyMaterial } = useApp();
+  const [localStudyMaterial, setLocalStudyMaterial] = useState(studyMaterial);
 
   const handleStartTeaching = () => {
-    if (studyMaterial.length >= 100) {
+    if (localStudyMaterial.length >= 100) {
+      setStudyMaterial(localStudyMaterial);
       navigate("/processing");
     }
   };
 
   const handleUseSample = () => {
-    setStudyMaterial(mockSession.sourceText);
+    setLocalStudyMaterial(mockSession.sourceText);
   };
 
   return (
@@ -50,8 +53,8 @@ const MaterialScreen = () => {
             className="w-full lg:w-1/3 flex flex-col items-center gap-4 lg:sticky lg:top-8"
           >
             <PixelAvatar state="thinking" size="setup" className="flex-shrink-0" />
-            <MessageBox 
-              message="Paste your study material below. I'll read it and we'll practice together!" 
+            <MessageBox
+              message="Paste your study material below. I'll read it and we'll practice together!"
               variant="dotted"
             />
           </motion.div>
@@ -72,41 +75,41 @@ const MaterialScreen = () => {
               </p>
             </div>
 
-            <NeumorphicTextArea
+            <RetroTextArea
               placeholder="Paste your study material here... (minimum 100 characters)"
-              value={studyMaterial}
-              onChange={(e) => setStudyMaterial(e.target.value)}
+              value={localStudyMaterial}
+              onChange={(e) => setLocalStudyMaterial(e.target.value)}
               maxLength={5000}
               showCount
               rows={12}
             />
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <NeumorphicButton
+              <RetroButton
                 onClick={handleStartTeaching}
-                disabled={studyMaterial.length < 100}
+                disabled={localStudyMaterial.length < 100}
                 variant="primary"
                 className="flex-1"
               >
                 Start Teaching
-              </NeumorphicButton>
+              </RetroButton>
 
-              <NeumorphicButton
+              <RetroButton
                 onClick={handleUseSample}
                 variant="outline"
                 className="sm:w-auto"
               >
                 Use Sample (Evolution)
-              </NeumorphicButton>
+              </RetroButton>
             </div>
 
-            {studyMaterial.length > 0 && studyMaterial.length < 100 && (
+            {localStudyMaterial.length > 0 && localStudyMaterial.length < 100 && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="text-sm text-muted-foreground text-center"
               >
-                {100 - studyMaterial.length} more characters needed
+                {100 - localStudyMaterial.length} more characters needed
               </motion.p>
             )}
           </motion.div>

@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+**URL**: <https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID>
 
 ## How can I edit this code?
 
@@ -62,7 +62,15 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### Vercel (Recommended)
+
+This project is configured for Vercel deployment with SPA routing (`vercel.json`).
+
+1. **Git Push**: Push your code to GitHub/Gitlab.
+2. **Import**: Import the repo in Vercel.
+3. **Deploy**: Vercel will auto-detect the Vite build settings.
+
+See `.agent/workflows/deploy_vercel.md` for detailed instructions.
 
 ## Can I connect a custom domain to my Lovable project?
 

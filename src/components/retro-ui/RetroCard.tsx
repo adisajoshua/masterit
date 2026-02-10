@@ -2,7 +2,7 @@ import { forwardRef } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Check, Star } from "lucide-react";
-interface NeumorphicCardProps {
+interface RetroCardProps {
   selected?: boolean;
   stars?: number;
   hoverable?: boolean;
@@ -10,7 +10,7 @@ interface NeumorphicCardProps {
   children?: React.ReactNode;
   onClick?: () => void;
 }
-const NeumorphicCard = forwardRef<HTMLDivElement, NeumorphicCardProps>(({
+const RetroCard = forwardRef<HTMLDivElement, RetroCardProps>(({
   className,
   selected,
   stars,
@@ -23,20 +23,20 @@ const NeumorphicCard = forwardRef<HTMLDivElement, NeumorphicCardProps>(({
   } : undefined} whileTap={hoverable ? {
     scale: 0.98
   } : undefined}>
-        {selected && <motion.div initial={{
+    {selected && <motion.div initial={{
       scale: 0
     }} animate={{
       scale: 1
     }} className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-primary flex items-center justify-center border-2 border-foreground">
-            <Check className="text-primary-foreground w-[20px] h-[20px]" />
-          </motion.div>}
-        
-        {stars !== undefined && <div className="flex gap-1 mb-3">
-            {[1, 2, 3, 4, 5].map(i => <Star key={i} className={cn("w-4 h-4 transition-colors", i <= stars ? "fill-accent-yellow text-accent-yellow" : "text-muted")} />)}
-          </div>}
-        
-        {children}
-      </motion.div>;
+      <Check className="text-primary-foreground w-[20px] h-[20px]" />
+    </motion.div>}
+
+    {stars !== undefined && <div className="flex gap-1 mb-3">
+      {[1, 2, 3, 4, 5].map(i => <Star key={i} className={cn("w-4 h-4 transition-colors", i <= stars ? "fill-accent-yellow text-accent-yellow" : "text-muted")} />)}
+    </div>}
+
+    {children}
+  </motion.div>;
 });
-NeumorphicCard.displayName = "NeumorphicCard";
-export default NeumorphicCard;
+RetroCard.displayName = "RetroCard";
+export default RetroCard;

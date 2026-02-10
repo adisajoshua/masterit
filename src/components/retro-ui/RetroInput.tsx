@@ -3,16 +3,16 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 
-interface NeumorphicInputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface RetroInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   showValidCheck?: boolean;
   isValid?: boolean;
 }
 
-const NeumorphicInput = forwardRef<HTMLInputElement, NeumorphicInputProps>(
+const RetroInput = forwardRef<HTMLInputElement, RetroInputProps>(
   ({ className, label, showValidCheck, isValid, ...props }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
-    
+
     return (
       <div className="relative w-full">
         {label && (
@@ -52,6 +52,6 @@ const NeumorphicInput = forwardRef<HTMLInputElement, NeumorphicInputProps>(
   }
 );
 
-NeumorphicInput.displayName = "NeumorphicInput";
+RetroInput.displayName = "RetroInput";
 
-export default NeumorphicInput;
+export default RetroInput;

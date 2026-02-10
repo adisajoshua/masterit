@@ -31,6 +31,7 @@ export interface Concept {
   snippet: string;
   confidence: number;
   mastery: number;
+  sub_concepts?: { id: string; title: string; completed: boolean }[];
   questions: Question[];
 }
 
@@ -52,6 +53,11 @@ export const concepts: Concept[] = [
       { id: "q1", text: "What is natural selection in simple terms?", expectedAnswer: "It's when organisms with helpful traits survive better and have more offspring, so those traits become more common over time." },
       { id: "q2", text: "How does this cause species to change?", expectedAnswer: "Over many generations, helpful traits keep getting passed on while harmful ones disappear, so the whole population slowly changes." },
       { id: "q3", text: "Can you give me a real example?", expectedAnswer: "The peppered moths in England - when pollution darkened the trees, dark moths survived better because birds couldn't see them." }
+    ],
+    sub_concepts: [
+      { id: "sc_variation", title: "Genetic Variation", completed: true, difficulty: "basic" },
+      { id: "sc_selection", title: "Selective Pressure", completed: false, difficulty: "intermediate" },
+      { id: "sc_adaptation", title: "Adaptation", completed: false, difficulty: "advanced" }
     ]
   },
   {
@@ -89,7 +95,43 @@ export const mockCycleSummaries: Record<string, CycleSummary> = {
 export const mockSession = {
   sourceText: evolutionInputText,
   concepts,
-  sessionStats: { timeSpent: "22:30", questionsAnswered: 9, gapsToReview: ["Genetic drift mechanisms", "Types of selection"] }
+  sessionStats: { timeSpent: "22:30", questionsAnswered: 9, gapsToReview: ["Genetic drift mechanisms", "Types of selection"] },
+  metrics: {
+    coverage: 90,
+    consistency: 85,
+    depth: 70
+  },
+  trajectory: {
+    startDifficulty: "basic",
+    endDifficulty: "intermediate",
+    path: ["basic", "intermediate", "intermediate"]
+  },
+  history: [
+    {
+      id: "h1",
+      question: "What is natural selection in simple terms?",
+      userAnswer: "It's survival of the fittest.",
+      aiFeedback: "That's a common phrase, but it misses the 'reproduction' part. Survival implies living longer, but natural selection is about passing on traits.",
+      score: 0.6,
+      status: "partial"
+    },
+    {
+      id: "h2",
+      question: "How does this cause species to change?",
+      userAnswer: "Good traits get passed down, bad ones don't.",
+      aiFeedback: "Exactly! This differential reproduction shifts the population's traits over time.",
+      score: 0.95,
+      status: "correct"
+    },
+    {
+      id: "h3",
+      question: "What is genetic drift?",
+      userAnswer: "I don't know.",
+      aiFeedback: "It's random changes in gene frequencies, like stepping on a bug. It wasn't 'less fit', just unlucky.",
+      score: 0.1,
+      status: "incorrect"
+    }
+  ]
 };
 
 export const mockAchievements = [
