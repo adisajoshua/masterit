@@ -23,7 +23,14 @@ import { useAdaptiveSession } from "@/hooks/useAdaptiveSession";
 
 const TeachingScreen = () => {
   const navigate = useNavigate();
-  const { addXP } = useApp();
+  const { addXP, selectedConcept } = useApp();
+
+  // Redirect if no concept selected
+  useEffect(() => {
+    if (!selectedConcept) {
+      navigate('/concepts');
+    }
+  }, [selectedConcept, navigate]);
 
   const {
     currentQuestion,
@@ -32,12 +39,12 @@ const TeachingScreen = () => {
     submitAnswer,
     adaptationMessage,
     clearAdaptationMessage,
-    concept, // Added concept object
+    concept,
     conceptTitle,
     progress,
     remediationData,
-    triggerAdaptation // New trigger
-  } = useAdaptiveSession();
+    triggerAdaptation
+  } = useAdaptiveSession(selectedConcept?.id);
 
   const [answer, setAnswer] = useState("");
   const [isRecording, setIsRecording] = useState(false);

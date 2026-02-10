@@ -11,12 +11,10 @@ import XPCounter from "@/components/ui/XPCounter";
 import BackNavigation from "@/components/ui/BackNavigation";
 import { useApp } from "@/context/AppContext";
 import { cn } from "@/lib/utils";
+import { AdaptiveConcept } from "@/types/adaptive";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
 import { SubConceptSelector } from "@/components/adaptive/SubConceptSelector";
 
@@ -26,7 +24,7 @@ const ConceptsScreen = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [targetedSubConcept, setTargetedSubConcept] = useState<string | null>(null);
 
-  const handleConceptSelect = (concept: any) => {
+  const handleConceptSelect = (concept: AdaptiveConcept) => {
     if (completedConcepts.includes(concept.id)) return;
     setSelectedConcept(concept);
     setIsDialogOpen(true);
@@ -35,6 +33,12 @@ const ConceptsScreen = () => {
   const handleStartSession = () => {
     setIsDialogOpen(false);
     navigate("/teaching");
+  };
+
+  const getConfidenceStars = (confidence: string) => {
+    if (confidence === 'high') return 5;
+    if (confidence === 'medium') return 3;
+    return 1;
   };
 
   return (
@@ -90,6 +94,10 @@ const ConceptsScreen = () => {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {concepts.map((concept, index) => {
                 const isCompleted = completedConcepts.includes(concept.id);
+                // Map AdaptiveConcept fields to UI
+                const starCount = getConfidenceStars(concept.parsing_confidence);
+                const mastery = concept.mastery || 0;
+                const snippet = concept.snippet || concept.source_text_snippet || "";
 
                 return (
                   <motion.div
@@ -113,7 +121,7 @@ const ConceptsScreen = () => {
                             key={i}
                             className={cn(
                               "w-4 h-4 transition-colors",
-                              i <= concept.confidence
+                              i <= starCount
                                 ? "fill-gold text-gold"
                                 : "text-muted"
                             )}
@@ -128,7 +136,7 @@ const ConceptsScreen = () => {
 
                       {/* Snippet */}
                       <p className="text-sm text-muted-foreground line-clamp-3">
-                        {concept.snippet}
+                        {snippet}
                       </p>
 
                       {/* Mastery indicator */}
@@ -141,14 +149,14 @@ const ConceptsScreen = () => {
                             "font-mono",
                             isCompleted ? "text-foreground" : "text-coral"
                           )}>
-                            {isCompleted ? "Completed" : `${concept.mastery}%`}
+                            {isCompleted ? "Completed" : `${mastery}%`}
                           </span>
                         </div>
                         <div className="mt-1 h-1.5 bg-muted rounded-full overflow-hidden">
                           <motion.div
                             className="h-full bg-foreground"
                             initial={{ width: 0 }}
-                            animate={{ width: isCompleted ? "100%" : `${concept.mastery}%` }}
+                            animate={{ width: isCompleted ? "100%" : `${mastery}%` }}
                             transition={{ delay: 0.6 + index * 0.1, duration: 0.5 }}
                           />
                         </div>

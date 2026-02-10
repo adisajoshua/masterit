@@ -8,7 +8,16 @@ import LoadingDots from "@/components/ui/LoadingDots";
 import { cn } from "@/lib/utils";
 import { useApp } from "@/context/AppContext";
 import { RealAdaptiveService, USE_REAL_AI } from "@/services/ai/RealAdaptiveService";
-import { Concept } from "@/data/mockData";
+import { AdaptiveConcept } from "@/types/adaptive";
+
+// ... existing imports
+
+// ... inside component
+
+// Update Context
+if (result.concepts && Array.isArray(result.concepts)) {
+  setConcepts(result.concepts as AdaptiveConcept[]);
+}
 
 interface ProcessingStep {
   id: string;

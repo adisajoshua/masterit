@@ -73,11 +73,47 @@ export class RealAdaptiveService {
             });
 
             if (!response.ok) throw new Error('Curriculum Generation Failed');
-            return await response.json();
+            const result = await response.json();
+
+            // TRANSFORM: Hydrate the flat concepts into AdaptiveConcepts with Question Pools
+            const hydratedConcepts = result.concepts.map((param: any) => this.hydrateConcept(param));
+            return { concepts: hydratedConcepts };
+
         } catch (error) {
             console.error("Curriculum Gen Error", error);
             throw error;
         }
+    }
+
+    /**
+     * Helper to transform flat API concept into AdaptiveConcept with Pools
+     */
+    private static hydrateConcept(flatConcept: any): AdaptiveConcept {
+        const pools: any = {
+            connection: {},
+            application: {}
+        };
+
+        const questions = flatConcept.questions || [];
+
+        // Distribute questions into pools
+        questions.forEach((q: AdaptiveQuestion) => {
+            if (q.type === 'connection' || q.type === 'application') {
+                if (!pools[q.type][q.difficulty]) {
+                    pools[q.type][q.difficulty] = q;
+                }
+            }
+        });
+
+        return {
+            ...flatConcept,
+            source_text_snippet: flatConcept.snippet || flatConcept.source_text_snippet,
+            question_pools: pools,
+            // Ensure other required fields exist
+            parsing_confidence: flatConcept.parsing_confidence || 'medium',
+            estimated_difficulty: flatConcept.estimated_difficulty || 'intermediate',
+            core_statements: flatConcept.core_statements || []
+        };
     }
 
     // --- Public Methods matching SimulatedAdaptiveService signature ---
@@ -119,13 +155,6 @@ export class RealAdaptiveService {
         });
 
         // Map AI evaluation to Analysis result
-        // AI return 0-100 mastery. We need a score 1-3 for the hook logic? 
-        // Or does the hook use score?
-        // Looking at useAdaptiveSession:
-        // Score 1 -> Decrease
-        // Score 2 -> Maintain
-        // Score 3 -> Increase
-
         let score = 2;
         if (aiResult.masteryScore < 60) score = 1;
         if (aiResult.masteryScore > 85) score = 3;
@@ -149,32 +178,40 @@ export class RealAdaptiveService {
         history: AdaptiveQuestion[],
         difficulty: "basic" | "intermediate" | "advanced"
     ): Promise<AdaptiveQuestion> {
-        // Filter the concept's verified questions by the current difficulty
-        const pool = concept.questions.filter(q => q.difficulty === difficulty);
+        // HYBRID: Use the hydrated pools
+        // We need to pick a question type first? Or just pick any from the difficulty?
+        // The game hook usually decides the type (Conn/App).
+        // BUT this method signature doesn't take 'type'. It only takes 'difficulty'.
+        // This implies the Hook calls this ONLY when it needs *any* question of that difficulty?
+        // Let's look at the Hook again... actually the Hook uses `concept.question_pools[...]`.
+        // It DOES NOT call this method by default.
+        // It ONLY calls this method if we were using the Interface directly.
+
+        // Since we are fixing the data structure mismatch, we rely on the `concept` object having `question_pools`.
+        // So this method might actually be redundant or used for Fallback?
+        // Let's implement it safely using the pools.
+
+        const connQ = concept.question_pools?.connection?.[difficulty];
+        const appQ = concept.question_pools?.application?.[difficulty];
+
+        const pool = [connQ, appQ].filter(Boolean) as AdaptiveQuestion[];
 
         // Find one we haven't answered yet
         const historyIds = new Set(history.map(h => h.id));
         const available = pool.filter(q => !historyIds.has(q.id));
 
-        // If we have available questions, pick a random one
         if (available.length > 0) {
-            const randomIndex = Math.floor(Math.random() * available.length);
-            return available[randomIndex];
-        }
-
-        // If we ran out of questions for this difficulty, verify if we can pick ANY question
-        const anyAvailable = concept.questions.filter(q => !historyIds.has(q.id));
-        if (anyAvailable.length > 0) {
-            const randomIndex = Math.floor(Math.random() * anyAvailable.length);
-            return anyAvailable[randomIndex];
+            return available[0]; // Just return first available
         }
 
         // Fallback: If absolutely no questions left, return a "Review" placeholder
         return {
             id: `fallback_${Date.now()}`,
             text: "You've covered all the planned questions for this topic! Tell me, what was the most interesting thing you learned?",
-            type: 'open',
-            difficulty: 'intermediate'
+            type: 'diagnostic', // Fallback type
+            difficulty: 'intermediate',
+            target_statements: [],
+            cognitive_level: 'analyze'
         };
     }
 

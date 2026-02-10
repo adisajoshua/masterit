@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { mockSession, Concept, CycleSummary } from "@/data/mockData";
+import { CycleSummary } from "@/data/mockData";
+import { AdaptiveConcept } from "@/types/adaptive";
+import { mockAdaptiveConcepts } from "@/data/mockAdaptiveData";
 
 interface AppState {
   userName: string;
@@ -8,10 +10,10 @@ interface AppState {
   setStudyMaterial: (material: string) => void;
   totalXP: number;
   addXP: (amount: number) => void;
-  concepts: Concept[];
-  setConcepts: (concepts: Concept[]) => void;
-  selectedConcept: Concept | null;
-  setSelectedConcept: (concept: Concept | null) => void;
+  concepts: AdaptiveConcept[];
+  setConcepts: (concepts: AdaptiveConcept[]) => void;
+  selectedConcept: AdaptiveConcept | null;
+  setSelectedConcept: (concept: AdaptiveConcept | null) => void;
   currentQuestionIndex: number;
   setCurrentQuestionIndex: (index: number) => void;
   currentCycleSummary: CycleSummary | null;
@@ -27,8 +29,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [userName, setUserName] = useState("");
   const [studyMaterial, setStudyMaterial] = useState("");
   const [totalXP, setTotalXP] = useState(0);
-  const [concepts, setConcepts] = useState<Concept[]>(mockSession.concepts);
-  const [selectedConcept, setSelectedConcept] = useState<Concept | null>(null);
+  const [concepts, setConcepts] = useState<AdaptiveConcept[]>(mockAdaptiveConcepts);
+  const [selectedConcept, setSelectedConcept] = useState<AdaptiveConcept | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentCycleSummary, setCurrentCycleSummary] = useState<CycleSummary | null>(null);
   const [completedConcepts, setCompletedConcepts] = useState<string[]>([]);

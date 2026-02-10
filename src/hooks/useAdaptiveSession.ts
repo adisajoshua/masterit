@@ -4,6 +4,7 @@ import { AdaptiveConcept, AdaptiveQuestion, DifficultyLevel, QuestionType } from
 import { mockAdaptiveConcepts } from '../data/mockAdaptiveData';
 import { adaptiveService as simulatedService } from '@/services/ai/SimulatedAdaptiveService';
 import { RealAdaptiveService, USE_REAL_AI } from '@/services/ai/RealAdaptiveService';
+import { useApp } from "@/context/AppContext";
 
 // Select the service based on the Feature Flag
 const adaptiveService = USE_REAL_AI ? RealAdaptiveService : simulatedService;
@@ -19,8 +20,11 @@ export interface AdaptiveState {
 }
 
 export function useAdaptiveSession(conceptId: string = 'natural-selection-adaptive') {
+    const { concepts } = useApp();
+
+    // Find concept in Context (Real AI data) OR fallback to Mock Data
     const [concept] = useState<AdaptiveConcept>(() =>
-        mockAdaptiveConcepts.find(c => c.id === conceptId) || mockAdaptiveConcepts[0]
+        concepts.find(c => c.id === conceptId) || mockAdaptiveConcepts.find(c => c.id === conceptId) || mockAdaptiveConcepts[0]
     );
 
     const [currentDifficulty, setCurrentDifficulty] = useState<DifficultyLevel>('intermediate');

@@ -45,6 +45,9 @@ export interface AdaptiveConcept {
         concept_density: number;
         subject_area: string;
     };
+    // UI Support Fields
+    mastery?: number; // 0-100
+    snippet?: string; // Legacy support or short summary
 }
 
 export interface AdaptiveSession {
