@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { CycleSummary } from "@/data/mockData";
 import { AdaptiveConcept } from "@/types/adaptive";
 import { mockAdaptiveConcepts } from "@/data/mockAdaptiveData";
@@ -26,14 +26,31 @@ interface AppState {
 const AppContext = createContext<AppState | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
-  const [userName, setUserName] = useState("");
-  const [studyMaterial, setStudyMaterial] = useState("");
-  const [totalXP, setTotalXP] = useState(0);
-  const [concepts, setConcepts] = useState<AdaptiveConcept[]>(mockAdaptiveConcepts);
-  const [selectedConcept, setSelectedConcept] = useState<AdaptiveConcept | null>(null);
+  const [userName, setUserName] = useState(() => localStorage.getItem("userName") || "");
+  const [studyMaterial, setStudyMaterial] = useState(() => localStorage.getItem("studyMaterial") || "");
+  const [totalXP, setTotalXP] = useState(() => Number(localStorage.getItem("totalXP")) || 0);
+  const [concepts, setConcepts] = useState<AdaptiveConcept[]>(() => {
+    const saved = localStorage.getItem("concepts");
+    return saved ? JSON.parse(saved) : mockAdaptiveConcepts;
+  });
+  const [selectedConcept, setSelectedConcept] = useState<AdaptiveConcept | null>(() => {
+    const saved = localStorage.getItem("selectedConcept");
+    return saved ? JSON.parse(saved) : null;
+  });
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentCycleSummary, setCurrentCycleSummary] = useState<CycleSummary | null>(null);
-  const [completedConcepts, setCompletedConcepts] = useState<string[]>([]);
+  const [completedConcepts, setCompletedConcepts] = useState<string[]>(() => {
+    const saved = localStorage.getItem("completedConcepts");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Persistence Effects
+  useEffect(() => { localStorage.setItem("userName", userName); }, [userName]);
+  useEffect(() => { localStorage.setItem("studyMaterial", studyMaterial); }, [studyMaterial]);
+  useEffect(() => { localStorage.setItem("totalXP", totalXP.toString()); }, [totalXP]);
+  useEffect(() => { localStorage.setItem("concepts", JSON.stringify(concepts)); }, [concepts]);
+  useEffect(() => { localStorage.setItem("selectedConcept", JSON.stringify(selectedConcept)); }, [selectedConcept]);
+  useEffect(() => { localStorage.setItem("completedConcepts", JSON.stringify(completedConcepts)); }, [completedConcepts]);
 
   const addXP = (amount: number) => {
     setTotalXP((prev) => prev + amount);

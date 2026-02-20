@@ -36,6 +36,9 @@ Return valid JSON with this EXACT structure (ensure all fields are present):
       "mastery": 0, 
       "source_text_snippet": "Relevant source text...",
       "core_statements": ["Statement 1", "Statement 2"],
+      "sub_concepts": [
+        { "id": "sub-1", "title": "Sub-concept Title", "completed": false }
+      ],
       "questions": [
         // GENERATE AT LEAST 6 QUESTIONS PER CONCEPT (2 Basic, 2 Int, 2 Adv)
         {
