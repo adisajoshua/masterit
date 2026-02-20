@@ -31,6 +31,7 @@ Return valid JSON with this EXACT structure (ensure all fields are present):
       "id": "slug-id",
       "title": "Clear Concept Title",
       "snippet": "Short definition/summary (max 200 chars)",
+      "diagnostic_prompt": "A warm, open-ended question to see what the student already knows about this specific concept",
       "confidence": 3, 
       "mastery": 0, 
       "source_text_snippet": "Relevant source text...",

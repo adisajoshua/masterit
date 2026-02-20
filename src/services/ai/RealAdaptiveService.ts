@@ -112,7 +112,8 @@ export class RealAdaptiveService {
             // Ensure other required fields exist
             parsing_confidence: flatConcept.parsing_confidence || 'medium',
             estimated_difficulty: flatConcept.estimated_difficulty || 'intermediate',
-            core_statements: flatConcept.core_statements || []
+            core_statements: flatConcept.core_statements || [],
+            diagnostic_prompt: flatConcept.diagnostic_prompt || `What do you already know about ${flatConcept.title}? I'd love to hear your thoughts!`
         };
     }
 
