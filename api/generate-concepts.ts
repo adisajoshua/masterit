@@ -7,7 +7,8 @@ export const config = {
 };
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: 'https://api.groq.com/openai/v1',
 });
 
 const CURRICULUM_PROMPT = `
@@ -61,7 +62,7 @@ export default async function handler(req: Request) {
     const { text } = await req.json();
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'llama-3.3-70b-versatile',
       messages: [
         { role: 'system', content: CURRICULUM_PROMPT },
         { role: 'user', content: `Analyze this material:\n\n${text.substring(0, 15000)}` } // Limit text

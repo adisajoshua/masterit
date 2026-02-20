@@ -5,7 +5,8 @@ export const config = {
 };
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.GROQ_API_KEY,
+    baseURL: 'https://api.groq.com/openai/v1',
 });
 
 const EVAL_PROMPT = `
@@ -43,7 +44,7 @@ export default async function handler(req: Request) {
         const { question, answer, concept } = await req.json();
 
         const response = await openai.chat.completions.create({
-            model: 'gpt-4o-mini',
+            model: 'llama-3.3-70b-versatile',
             messages: [
                 { role: 'system', content: EVAL_PROMPT },
                 { role: 'user', content: `Concept: ${concept}\nQuestion: ${question}\nStudent Answer: ${answer}` }
