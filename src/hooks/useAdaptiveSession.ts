@@ -36,14 +36,20 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
     const [questionIndex, setQuestionIndex] = useState(() =>
         Number(localStorage.getItem(`session_index_${concept.id}`)) || 0
     );
+    const [history, setHistory] = useState<{ question: string, answer: string, score: number, type: string, difficulty: string }[]>(() => {
+        const saved = localStorage.getItem(`session_history_${concept.id}`);
+        return saved ? JSON.parse(saved) : [];
+    });
     const [adaptationMessage, setAdaptationMessage] = useState<{ type: string; reason: string; from?: DifficultyLevel; to?: DifficultyLevel } | null>(null);
+    const { setCurrentCycleSummary, addXP, markConceptComplete } = useApp();
 
     // Persistence Effects
     useEffect(() => {
         localStorage.setItem(`session_diff_${concept.id}`, currentDifficulty);
         localStorage.setItem(`session_type_${concept.id}`, questionType);
         localStorage.setItem(`session_index_${concept.id}`, questionIndex.toString());
-    }, [currentDifficulty, questionType, questionIndex, concept.id]);
+        localStorage.setItem(`session_history_${concept.id}`, JSON.stringify(history));
+    }, [currentDifficulty, questionType, questionIndex, history, concept.id]);
 
     // Helper to get next question based on current state
     const getNextQuestion = (type: QuestionType, difficulty: DifficultyLevel): AdaptiveQuestion => {
@@ -111,8 +117,8 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
                 adaptation = {
                     type: nextDifficulty === 'basic' ? 'difficulty_decrease' : 'difficulty_increase',
                     reason: nextDifficulty === 'basic'
-                        ? "Starting with foundational concepts based on your explanation."
-                        : "Strong start! Jumping straight to advanced connections.",
+                        ? "Okay, I think I'm starting to get the basics. Could we keep it simple for now so I don't get mixed up?"
+                        : "Whoa, I think I'm actually following this really well! Do you want to try some of the tricky stuff now?",
                     from: 'intermediate',
                     to: nextDifficulty
                 };
@@ -131,21 +137,16 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
                 targetStatements: currentQuestion.target_statements.map(idx => concept.core_statements[idx])
             });
 
-            // Logic to determine next step based on score (1-3)
             const score = analysisResult.score;
 
             if (questionType === 'connection') {
                 nextType = 'application';
 
-                // Adaptive Logic from Spec:
-                // Score 1 -> Decrease Difficulty (if possible)
-                // Score 2 -> Maintain Difficulty
-                // Score 3 -> Increase Difficulty (if possible)
                 if (score === 1 && currentDifficulty !== 'basic') {
                     nextDifficulty = 'basic';
                     adaptation = {
                         type: 'difficulty_decrease',
-                        reason: analysisResult.feedback || "Let's review the basics before moving on.",
+                        reason: "Wait, I'm a bit lost with those big ideas. Could we go back to the basic concepts first? It would really help me catch up!",
                         from: currentDifficulty,
                         to: 'basic'
                     };
@@ -153,16 +154,65 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
                     nextDifficulty = 'advanced';
                     adaptation = {
                         type: 'difficulty_increase',
-                        reason: analysisResult.feedback || "Great insight! Let's try a harder application.",
+                        reason: "Whoa, that's getting really clear! I think I'm ready to try a tougher challenge if you want to push me!",
                         from: currentDifficulty,
                         to: 'advanced'
                     };
                 }
             } else { // Application
-                // Finish session
-                return { isComplete: true, finalScore: score };
+                // PRIORITY 2: Holistic Analysis Algorithm (30/40/30)
+                const finalHistory = [...history, {
+                    question: currentQuestion.text,
+                    answer,
+                    score,
+                    type: questionType,
+                    difficulty: currentDifficulty
+                }];
+
+                const coveredIndices = new Set(finalHistory.flatMap(h => h.score >= 2 ? currentQuestion.target_statements : []));
+                const coverageScore = concept.core_statements.length > 0 ? (coveredIndices.size / concept.core_statements.length) : 1;
+                const scores = finalHistory.map(h => h.score);
+                const consistencyScore = 1 - (Math.max(...scores) - Math.min(...scores)) / 3;
+                const depthScore = Math.max(...scores) / 3;
+                const finalConfidence = (coverageScore * 0.3 + consistencyScore * 0.4 + depthScore * 0.3) * 100;
+
+                setCurrentCycleSummary({
+                    conceptId: concept.id,
+                    confidenceScore: Math.round(finalConfidence),
+                    masteryLevel: finalConfidence > 80 ? 'Strong' : finalConfidence > 50 ? 'Developing' : 'Starting',
+                    history: finalHistory.map((h, i) => ({
+                        id: i.toString(),
+                        question: h.question,
+                        userAnswer: h.answer,
+                        aiFeedback: "Great teaching session!",
+                        status: h.score === 3 ? 'correct' : h.score === 2 ? 'partial' : 'incorrect',
+                        score: h.score / 3
+                    })),
+                    metrics: {
+                        coverage: Math.round(coverageScore * 100),
+                        consistency: Math.round(consistencyScore * 100),
+                        depth: Math.round(depthScore * 100)
+                    },
+                    trajectory: {
+                        startDifficulty: 'intermediate',
+                        endDifficulty: currentDifficulty,
+                        path: finalHistory.map(h => h.difficulty as DifficultyLevel)
+                    }
+                });
+
+                markConceptComplete(concept.id);
+                return { isComplete: true, finalScore: finalConfidence };
             }
         }
+
+        const newHistory = [...history, {
+            question: currentQuestion.text,
+            answer,
+            score: analysisResult?.score || 2,
+            type: questionType,
+            difficulty: currentDifficulty
+        }];
+        setHistory(newHistory);
 
         setAdaptationMessage(adaptation);
         setCurrentDifficulty(nextDifficulty);
@@ -171,7 +221,7 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
         setQuestionIndex(prev => prev + 1);
 
         return { isComplete: false };
-    }, [currentDifficulty, questionType, concept, currentQuestion]);
+    }, [currentDifficulty, questionType, concept, currentQuestion, history, setCurrentCycleSummary, markConceptComplete]);
 
     return {
         currentQuestion,

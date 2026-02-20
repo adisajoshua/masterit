@@ -31,15 +31,34 @@ export interface Concept {
   snippet: string;
   confidence: number;
   mastery: number;
-  sub_concepts?: { id: string; title: string; completed: boolean }[];
+  sub_concepts?: { id: string; title: string; completed: boolean; difficulty?: string }[];
   questions: Question[];
 }
 
 export interface CycleSummary {
-  masteryPercentage: number;
-  xpEarned: number;
-  strengths: string[];
-  gaps: string[];
+  conceptId: string;
+  confidenceScore: number;
+  masteryLevel: string;
+  history: {
+    id: string;
+    question: string;
+    userAnswer: string;
+    aiFeedback: string;
+    status: 'correct' | 'partial' | 'incorrect';
+    score: number;
+  }[];
+  metrics: {
+    coverage: number;
+    consistency: number;
+    depth: number;
+  };
+  trajectory: {
+    startDifficulty: string;
+    endDifficulty: string;
+    path: string[];
+  };
+  gapsToReview?: string[];
+  timeSpent?: string;
 }
 
 export const concepts: Concept[] = [
@@ -86,16 +105,20 @@ export const concepts: Concept[] = [
   }
 ];
 
-export const mockCycleSummaries: Record<string, CycleSummary> = {
-  "natural-selection": { masteryPercentage: 85, xpEarned: 75, strengths: ["Clear definitions", "Great examples"], gaps: ["Types of selection"] },
-  "evidence-evolution": { masteryPercentage: 72, xpEarned: 60, strengths: ["Comprehensive overview"], gaps: ["Homologous structures detail"] },
-  "genetic-drift": { masteryPercentage: 40, xpEarned: 30, strengths: ["Basic understanding"], gaps: ["Real-world examples", "Population size impact"] }
+export const mockCycleSummaries: Record<string, any> = {
+  "natural-selection": {
+    confidenceScore: 85,
+    masteryLevel: "Strong",
+    history: [],
+    metrics: { coverage: 90, consistency: 80, depth: 85 },
+    trajectory: { startDifficulty: "basic", endDifficulty: "intermediate", path: [] }
+  },
 };
 
-export const mockSession = {
-  sourceText: evolutionInputText,
-  concepts,
-  sessionStats: { timeSpent: "22:30", questionsAnswered: 9, gapsToReview: ["Genetic drift mechanisms", "Types of selection"] },
+export const mockSession: CycleSummary = {
+  conceptId: "natural-selection",
+  confidenceScore: 78,
+  masteryLevel: "Developing",
   metrics: {
     coverage: 90,
     consistency: 85,
@@ -111,7 +134,7 @@ export const mockSession = {
       id: "h1",
       question: "What is natural selection in simple terms?",
       userAnswer: "It's survival of the fittest.",
-      aiFeedback: "That's a common phrase, but it misses the 'reproduction' part. Survival implies living longer, but natural selection is about passing on traits.",
+      aiFeedback: "Whoa, I thought it was just about surviving, but you said 'passing on traits'... that makes way more sense!",
       score: 0.6,
       status: "partial"
     },
@@ -119,7 +142,7 @@ export const mockSession = {
       id: "h2",
       question: "How does this cause species to change?",
       userAnswer: "Good traits get passed down, bad ones don't.",
-      aiFeedback: "Exactly! This differential reproduction shifts the population's traits over time.",
+      aiFeedback: "Ohhh! So the population literally looks different later? That's so cool!",
       score: 0.95,
       status: "correct"
     },
@@ -127,7 +150,7 @@ export const mockSession = {
       id: "h3",
       question: "What is genetic drift?",
       userAnswer: "I don't know.",
-      aiFeedback: "It's random changes in gene frequencies, like stepping on a bug. It wasn't 'less fit', just unlucky.",
+      aiFeedback: "Hmm, is it like when something random happens? I'm a bit lost too...",
       score: 0.1,
       status: "incorrect"
     }

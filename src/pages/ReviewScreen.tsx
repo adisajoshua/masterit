@@ -15,7 +15,7 @@ import { NextStepCard, NextStepType } from "@/components/adaptive/NextStepCard";
 
 const ReviewScreen = () => {
   const navigate = useNavigate();
-  const { totalXP, concepts, resetSession } = useApp();
+  const { totalXP, concepts, resetSession, currentCycleSummary } = useApp();
   const [isTopicAnalysisOpen, setIsTopicAnalysisOpen] = useState(true);
   const [isQuestionBreakdownOpen, setIsQuestionBreakdownOpen] = useState(true);
 
@@ -24,30 +24,68 @@ const ReviewScreen = () => {
     navigate("/");
   };
 
+  const handleDownload = () => {
+    if (!effectiveSession) return;
+
+    const summary = `
+MASTERIT STUDY SUMMARY: ${concepts.find(c => c.id === effectiveSession.conceptId)?.title || 'General Topic'}
+Mastery Level: ${effectiveSession.masteryLevel} (${effectiveSession.confidenceScore}%)
+Date: ${new Date().toLocaleDateString()}
+
+METRICS:
+- Coverage: ${effectiveSession.metrics?.coverage}%
+- Consistency: ${effectiveSession.metrics?.consistency}%
+- Depth: ${effectiveSession.metrics?.depth}%
+
+SESSION TRAJECTORY:
+- Started: ${effectiveSession.trajectory?.startDifficulty}
+- Ended: ${effectiveSession.trajectory?.endDifficulty}
+- Steps: ${effectiveSession.trajectory?.path.join(' -> ')}
+
+QUESTION HISTORY:
+${effectiveSession.history?.map(h => `
+Q: ${h.question}
+A: ${h.userAnswer}
+Score: ${h.score * 100}%
+`).join('\n')}
+    `;
+
+    const blob = new Blob([summary], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `MasterIt_Summary_${effectiveSession.conceptId}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // PRIORITY 1: Dynamic Data Selection
+  // Use currentCycleSummary if available, else fallback to mockSession for safety/demo
+  const effectiveSession = currentCycleSummary || mockSession;
+  const history = effectiveSession.history || [];
+
   // Calculate session stats
-  const totalQuestions = concepts.reduce((acc, c) => acc + c.questions.length, 0);
-  const averageMastery = Math.round(
-    concepts.reduce((acc, c) => acc + c.mastery, 0) / concepts.length
-  );
+  const totalQuestions = history.length;
+  const averageMastery = effectiveSession.confidenceScore || 0;
 
   // Determine intelligent next step
   const getNextStep = (): { type: NextStepType; title: string; reason: string } => {
-    const endDifficulty = mockSession.trajectory?.endDifficulty;
-    const depth = mockSession.metrics?.depth || 0;
+    const endDifficulty = effectiveSession.trajectory?.endDifficulty;
+    const depth = effectiveSession.metrics?.depth || 0;
 
     if (endDifficulty === 'advanced' || (endDifficulty === 'intermediate' && depth > 70)) {
       return {
         type: 'advance',
-        title: "Evolutionary Mechanisms II",
-        reason: "You've mastered the core concepts.",
+        title: "Deeper Dive: Mechanisms",
+        reason: "You've shown strong mastery of these concepts.",
       };
     }
 
-    if (endDifficulty === 'basic' || (mockSession.metrics?.coverage || 0) < 50) {
+    if (endDifficulty === 'basic' || (effectiveSession.metrics?.coverage || 0) < 50) {
       return {
         type: 'remediate',
-        title: "Foundations of Selection",
-        reason: "Let's strengthen your basics first.",
+        title: "Foundations Recap",
+        reason: "Let's strengthen your basics before moving on.",
       };
     }
 
@@ -113,7 +151,7 @@ const ReviewScreen = () => {
                 {
                   icon: Clock,
                   label: "Time Spent",
-                  value: mockSession.sessionStats.timeSpent,
+                  value: effectiveSession.timeSpent || "10:00",
                   color: "text-sky",
                 },
                 {
@@ -159,17 +197,17 @@ const ReviewScreen = () => {
                 <div className="flex bg-background/50 rounded-full px-4 py-2 border border-border items-center gap-3">
                   <div className="flex flex-col items-center">
                     <span className="text-[10px] uppercase font-bold text-muted-foreground">Coverage</span>
-                    <span className="font-mono text-xs text-foreground">{mockSession.metrics?.coverage || 0}%</span>
+                    <span className="font-mono text-xs text-foreground">{effectiveSession.metrics?.coverage || 0}%</span>
                   </div>
                   <div className="h-6 w-px bg-border"></div>
                   <div className="flex flex-col items-center">
                     <span className="text-[10px] uppercase font-bold text-muted-foreground">Consistency</span>
-                    <span className="font-mono text-xs text-foreground">{mockSession.metrics?.consistency || 0}%</span>
+                    <span className="font-mono text-xs text-foreground">{effectiveSession.metrics?.consistency || 0}%</span>
                   </div>
                   <div className="h-6 w-px bg-border"></div>
                   <div className="flex flex-col items-center">
                     <span className="text-[10px] uppercase font-bold text-muted-foreground">Depth</span>
-                    <span className="font-mono text-xs text-foreground">{mockSession.metrics?.depth || 0}%</span>
+                    <span className="font-mono text-xs text-foreground">{effectiveSession.metrics?.depth || 0}%</span>
                   </div>
                 </div>
               </div>
@@ -188,11 +226,11 @@ const ReviewScreen = () => {
                     {/* Start Pill */}
                     <div className={cn(
                       "px-4 py-2 rounded-full border-2 font-bold uppercase tracking-wider text-sm whitespace-nowrap",
-                      mockSession.trajectory?.startDifficulty === 'basic' ? "bg-green-100 text-green-700 border-green-200" :
-                        mockSession.trajectory?.startDifficulty === 'advanced' ? "bg-red-100 text-red-700 border-red-200" :
+                      effectiveSession.trajectory?.startDifficulty === 'basic' ? "bg-green-100 text-green-700 border-green-200" :
+                        effectiveSession.trajectory?.startDifficulty === 'advanced' ? "bg-red-100 text-red-700 border-red-200" :
                           "bg-yellow-100 text-yellow-700 border-yellow-200"
                     )}>
-                      {mockSession.trajectory?.startDifficulty}
+                      {effectiveSession.trajectory?.startDifficulty}
                     </div>
 
                     {/* Path Line */}
@@ -200,7 +238,7 @@ const ReviewScreen = () => {
                       <div className="absolute left-0 right-0 h-1 bg-border/50 rounded-full" />
                       {/* Dots for the path */}
                       <div className="flex justify-between w-full relative z-10 px-2">
-                        {mockSession.trajectory?.path.map((level, i) => (
+                        {effectiveSession.trajectory?.path.map((level, i) => (
                           <div key={i} className={cn(
                             "w-3 h-3 rounded-full border-2 border-background shadow-sm",
                             level === 'basic' ? "bg-green-500" :
@@ -218,11 +256,11 @@ const ReviewScreen = () => {
                     {/* End Pill */}
                     <div className={cn(
                       "px-4 py-2 rounded-full border-2 font-bold uppercase tracking-wider text-sm shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] whitespace-nowrap",
-                      mockSession.trajectory?.endDifficulty === 'basic' ? "bg-green-100 text-green-700 border-green-200" :
-                        mockSession.trajectory?.endDifficulty === 'advanced' ? "bg-red-100 text-red-700 border-red-200" :
+                      effectiveSession.trajectory?.endDifficulty === 'basic' ? "bg-green-100 text-green-700 border-green-200" :
+                        effectiveSession.trajectory?.endDifficulty === 'advanced' ? "bg-red-100 text-red-700 border-red-200" :
                           "bg-yellow-100 text-yellow-700 border-yellow-200"
                     )}>
-                      {mockSession.trajectory?.endDifficulty}
+                      {effectiveSession.trajectory?.endDifficulty}
                     </div>
                   </div>
                 </div>
@@ -355,7 +393,7 @@ const ReviewScreen = () => {
               </div>
               {isQuestionBreakdownOpen && (
                 <div className="space-y-4">
-                  {mockSession.history?.map((item: any, index: number) => (
+                  {effectiveSession.history?.map((item: any, index: number) => (
                     <div key={item.id} className="border-2 border-border-subtle rounded-xl p-4 space-y-2 bg-background/50">
                       <div className="flex justify-between items-start gap-4">
 
@@ -396,7 +434,7 @@ const ReviewScreen = () => {
             >
               <h2 className="font-semibold text-foreground">Areas to Review</h2>
               <ul className="space-y-2">
-                {mockSession.sessionStats.gapsToReview.map((gap, index) => (
+                {effectiveSession.gapsToReview?.map((gap: any, index: number) => (
                   <motion.li
                     key={index}
                     initial={{ opacity: 0, x: -10 }}
@@ -407,7 +445,9 @@ const ReviewScreen = () => {
                     <CheckCircle className="w-4 h-4 text-coral" />
                     {gap}
                   </motion.li>
-                ))}
+                )) || (
+                    <p className="text-sm text-muted-foreground italic">No specific gaps identified yet. Keep teaching!</p>
+                  )}
               </ul>
             </motion.div>
 
@@ -421,7 +461,7 @@ const ReviewScreen = () => {
               <RetroButton
                 variant="outline"
                 className="flex-1"
-                onClick={() => { }}
+                onClick={handleDownload}
               >
                 <Download className="w-4 h-4" />
                 Download Summary
