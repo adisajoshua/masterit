@@ -40,10 +40,16 @@ Return valid JSON with this EXACT structure (ensure all fields are present):
         { "id": "sub-1", "title": "Sub-concept Title", "completed": false }
       ],
       "questions": [
-        // GENERATE AT LEAST 6 QUESTIONS PER CONCEPT (2 Basic, 2 Int, 2 Adv)
+        // MANDATORY: Generate EXACTLY 6 Questions for the pool:
+        // 1. { type: "connection", difficulty: "basic" }
+        // 2. { type: "connection", difficulty: "intermediate" }
+        // 3. { type: "connection", difficulty: "advanced" }
+        // 4. { type: "application", difficulty: "basic" }
+        // 5. { type: "application", difficulty: "intermediate" }
+        // 6. { type: "application", difficulty: "advanced" }
         {
-          "id": "q_conn_basic_1",
-          "text": "Question text...",
+          "id": "q1",
+          "text": "...",
           "type": "connection", // or "application"
           "difficulty": "basic", // or "intermediate" or "advanced"
           "cognitive_level": "understand", 

@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { AdaptiveConcept, AdaptiveQuestion, DifficultyLevel, QuestionType } from '../types/adaptive';
 import { mockAdaptiveConcepts } from '../data/mockAdaptiveData';
 import { adaptiveService as simulatedService } from '@/services/ai/SimulatedAdaptiveService';
@@ -27,10 +27,23 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
         concepts.find(c => c.id === conceptId) || mockAdaptiveConcepts.find(c => c.id === conceptId) || mockAdaptiveConcepts[0]
     );
 
-    const [currentDifficulty, setCurrentDifficulty] = useState<DifficultyLevel>('intermediate');
-    const [questionType, setQuestionType] = useState<QuestionType>('diagnostic');
-    const [questionIndex, setQuestionIndex] = useState(0);
+    const [currentDifficulty, setCurrentDifficulty] = useState<DifficultyLevel>(() =>
+        (localStorage.getItem(`session_diff_${concept.id}`) as DifficultyLevel) || 'intermediate'
+    );
+    const [questionType, setQuestionType] = useState<QuestionType>(() =>
+        (localStorage.getItem(`session_type_${concept.id}`) as QuestionType) || 'diagnostic'
+    );
+    const [questionIndex, setQuestionIndex] = useState(() =>
+        Number(localStorage.getItem(`session_index_${concept.id}`)) || 0
+    );
     const [adaptationMessage, setAdaptationMessage] = useState<{ type: string; reason: string; from?: DifficultyLevel; to?: DifficultyLevel } | null>(null);
+
+    // Persistence Effects
+    useEffect(() => {
+        localStorage.setItem(`session_diff_${concept.id}`, currentDifficulty);
+        localStorage.setItem(`session_type_${concept.id}`, questionType);
+        localStorage.setItem(`session_index_${concept.id}`, questionIndex.toString());
+    }, [currentDifficulty, questionType, questionIndex, concept.id]);
 
     // Helper to get next question based on current state
     const getNextQuestion = (type: QuestionType, difficulty: DifficultyLevel): AdaptiveQuestion => {
@@ -55,8 +68,23 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
         // doesn't override it. 
         // Actually, RealAdaptiveService has `generateNextQuestion` as well.
         // Let's use the local logic here for simplicity unless we refactor completely.
-        const pool = concept.question_pools[type === 'connection' ? 'connection' : 'application'];
-        return pool[difficulty];
+        const poolType = type === 'connection' ? 'connection' : 'application';
+        const pool = concept.question_pools[poolType];
+
+        // Safety Fallback: Use requested difficulty, but fallback to any available question if missing
+        const question = pool[difficulty] || Object.values(pool).find(q => q);
+
+        if (question) return question;
+
+        // Emergency Fallback: If the pool is totally empty, return the diagnostic prompt again as a placeholder
+        return {
+            id: 'emergency_fallback',
+            text: `Let's dive deeper into ${concept.title}. Can you explain more about the most important parts as you see them?`,
+            type: 'diagnostic',
+            difficulty: 'intermediate',
+            target_statements: [],
+            cognitive_level: 'analyze'
+        };
     };
 
     const [currentQuestion, setCurrentQuestion] = useState<AdaptiveQuestion>(() =>
