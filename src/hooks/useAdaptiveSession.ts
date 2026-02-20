@@ -126,7 +126,9 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
                 response: answer,
                 questionType,
                 currentDifficulty,
-                expectedKeyTerms: currentQuestion.expected_response_characteristics?.key_terms
+                questionText: currentQuestion.text,
+                coreStatements: concept.core_statements,
+                targetStatements: currentQuestion.target_statements.map(idx => concept.core_statements[idx])
             });
 
             // Logic to determine next step based on score (1-3)

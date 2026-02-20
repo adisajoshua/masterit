@@ -1,4 +1,4 @@
-import { AdaptiveConcept, AdaptiveQuestion, AdaptiveSession } from "../../../types/adaptive";
+import { AdaptiveConcept, AdaptiveQuestion, AdaptiveSession } from "../../types/adaptive";
 
 // Feature Flag - easy switch between Real and Mock
 // You can set this in your .env file: VITE_USE_REAL_AI=true
@@ -36,7 +36,13 @@ export class RealAdaptiveService {
     /**
      * Calls the Vercel Function to evaluate an answer
      */
-    static async callEvaluateApi(data: { question: string; answer: string; concept: string }) {
+    static async callEvaluateApi(data: {
+        question: string;
+        answer: string;
+        concept: string;
+        coreStatements?: string[];
+        targetStatements?: string[];
+    }) {
         try {
             const response = await fetch('/api/evaluate', {
                 method: 'POST',
@@ -147,12 +153,16 @@ export class RealAdaptiveService {
         response: string;
         questionType: string;
         currentDifficulty: string;
-        expectedKeyTerms?: string[];
+        questionText: string;
+        coreStatements: string[];
+        targetStatements: string[];
     }) {
         const aiResult = await this.callEvaluateApi({
-            question: `[${params.currentDifficulty} ${params.questionType}] Question`, // Ideally pass real text
+            question: params.questionText,
             answer: params.response,
-            concept: params.conceptId
+            concept: params.conceptId,
+            coreStatements: params.coreStatements,
+            targetStatements: params.targetStatements
         });
 
         // Map AI evaluation to Analysis result
