@@ -10,12 +10,13 @@ interface ContextPanelProps {
     concept: AdaptiveConcept;
     currentDifficulty: "basic" | "intermediate" | "advanced";
     progress: number;
+    coveredIndices?: number[];
     className?: string;
     isMobile?: boolean;      // New prop
     onClose?: () => void;    // New prop
 }
 
-export function ContextPanel({ concept, currentDifficulty, progress, className, isMobile, onClose }: ContextPanelProps) {
+export function ContextPanel({ concept, currentDifficulty, progress, coveredIndices, className, isMobile, onClose }: ContextPanelProps) {
     const [activeTab, setActiveTab] = useState<"source" | "stats">("source");
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -141,12 +142,22 @@ export function ContextPanel({ concept, currentDifficulty, progress, className, 
                                             Core Concepts
                                         </h4>
                                         <ul className="space-y-2">
-                                            {concept.core_statements.map((stmt, idx) => (
-                                                <li key={idx} className="bg-blue-50/50 p-3 rounded border border-blue-100 text-sm leading-snug flex gap-2">
-                                                    <span className="text-blue-500 font-bold">•</span>
-                                                    {stmt}
-                                                </li>
-                                            ))}
+                                            {concept.core_statements.map((stmt, idx) => {
+                                                const isCovered = coveredIndices?.includes(idx);
+                                                return (
+                                                    <li key={idx} className={cn(
+                                                        "p-3 rounded border text-sm leading-snug flex gap-2 transition-colors",
+                                                        isCovered ? "bg-green-50/50 border-green-100" : "bg-blue-50/50 border-blue-100"
+                                                    )}>
+                                                        {isCovered ? (
+                                                            <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
+                                                        ) : (
+                                                            <span className="text-blue-500 font-bold shrink-0">•</span>
+                                                        )}
+                                                        <span className={isCovered ? "text-green-800" : ""}>{stmt}</span>
+                                                    </li>
+                                                );
+                                            })}
                                         </ul>
                                     </div>
                                 </motion.div>
@@ -188,36 +199,34 @@ export function ContextPanel({ concept, currentDifficulty, progress, className, 
                                         </h4>
                                         {/* Dynamic Concepts Checklist */}
                                         <div className="space-y-2">
-                                            {concept.sub_concepts ? (
-                                                concept.sub_concepts.map((sub, idx) => (
+                                            {concept.core_statements.map((stmt, idx) => {
+                                                const isCovered = coveredIndices?.includes(idx);
+                                                return (
                                                     <div key={idx} className={cn(
                                                         "flex items-center gap-3 p-3 rounded-lg border transition-all",
-                                                        sub.completed
-                                                            ? "bg-green-50/80 border-green-200"
-                                                            : "bg-surface border-border-subtle hover:border-foreground/30"
+                                                        isCovered
+                                                            ? "bg-green-50/80 border-green-200 shadow-sm"
+                                                            : "bg-surface border-border-subtle hover:border-foreground/30 opacity-60"
                                                     )}>
                                                         <div className={cn(
                                                             "w-5 h-5 rounded-full flex items-center justify-center border-2 transition-colors",
-                                                            sub.completed
+                                                            isCovered
                                                                 ? "bg-green-500 border-green-600 text-white"
                                                                 : "border-muted-foreground/30"
                                                         )}>
-                                                            {/* Simple checkmark icon replacement */}
-                                                            {sub.completed && (
+                                                            {isCovered && (
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                                             )}
                                                         </div>
                                                         <span className={cn(
                                                             "text-sm font-medium",
-                                                            sub.completed ? "text-green-900" : "text-foreground"
+                                                            isCovered ? "text-green-900" : "text-foreground"
                                                         )}>
-                                                            {sub.title}
+                                                            {stmt}
                                                         </span>
                                                     </div>
-                                                ))
-                                            ) : (
-                                                <p className="text-xs text-muted-foreground italic">No sub-concepts tracked.</p>
-                                            )}
+                                                );
+                                            })}
                                         </div>
                                     </div>
 

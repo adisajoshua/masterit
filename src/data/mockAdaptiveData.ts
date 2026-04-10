@@ -19,12 +19,12 @@ export const mockAdaptiveConcepts: AdaptiveConcept[] = [
             { id: "sc_adaptation", title: "Adaptation", completed: false, difficulty: "advanced" },
             { id: "sc_inheritance", title: "Heritability", completed: false, difficulty: "intermediate" }
         ],
-        diagnostic_prompt: "Thinking about how nature 'selects' traits, what is the most important thing to understand about how this process works?",
+        diagnostic_prompt: "I'm really curious about how nature actually 'picks' which traits win. What's the most important thing I should understand about how that whole process works?",
         question_pools: {
             connection: {
                 basic: {
                     id: "q_conn_basic_1",
-                    text: "In your own words, how is natural selection similar to a filter?",
+                    text: "So, if nature is like a filter, what exactly gets filtered out and what gets to stay? I'm trying to visualize how that works in real life.",
                     type: "connection",
                     difficulty: "basic",
                     target_statements: [0, 2],
@@ -41,7 +41,7 @@ export const mockAdaptiveConcepts: AdaptiveConcept[] = [
                 },
                 intermediate: {
                     id: "q_conn_int_1",
-                    text: "Explain the causal link between an organism's traits and its reproductive success in a specific environment.",
+                    text: "Okay, I think I get the filter part. But why does having a better trait actually lead to having more babies? Like, what's the actual connection between surviving better and being a 'successful' parent?",
                     type: "connection",
                     difficulty: "intermediate",
                     target_statements: [0, 1],
@@ -58,7 +58,7 @@ export const mockAdaptiveConcepts: AdaptiveConcept[] = [
                 },
                 advanced: {
                     id: "q_conn_adv_1",
-                    text: "Critique the phrase 'survival of the fittest' based on your understanding of natural selection. What nuance does it miss?",
+                    text: "I've heard people say 'survival of the fittest' all the time, but is that actually the whole story? It feels like it might be missing something important about how the traits actually pass down. What do you think?",
                     type: "connection",
                     difficulty: "advanced",
                     target_statements: [0, 1, 2],
@@ -77,7 +77,7 @@ export const mockAdaptiveConcepts: AdaptiveConcept[] = [
             application: {
                 basic: {
                     id: "q_app_basic_1",
-                    text: "Imagine a population of beetles where some are green and some are brown. If birds can see the green ones more easily on brown bark, what will happen to the population over time?",
+                    text: "If there's a bunch of beetles and some are green and some are brown, and they're all living on brown tree bark... if a bird comes along, what's going to happen to the beetle 'family tree' over the next few batches of babies?",
                     type: "application",
                     difficulty: "basic",
                     target_statements: [0, 2],
@@ -94,7 +94,7 @@ export const mockAdaptiveConcepts: AdaptiveConcept[] = [
                 },
                 intermediate: {
                     id: "q_app_int_1",
-                    text: "A new predator is introduced that hunts only at night. How might this environmental change affect the traits of a prey population over several generations?",
+                    text: "If a new predator showed up that only hunted at night, would that change which traits are 'good' for the prey? Like, how would the population look different after 100 years?",
                     type: "application",
                     difficulty: "intermediate",
                     target_statements: [1, 2],
@@ -111,7 +111,7 @@ export const mockAdaptiveConcepts: AdaptiveConcept[] = [
                 },
                 advanced: {
                     id: "q_app_adv_1",
-                    text: "Consider a species that reproduces asexually versus one that reproduces sexually. Evaluate how natural selection would operate differently on these two populations during a rapid environmental change.",
+                    text: "Wait, so if a whole species is just clones of each other versus a species where everyone is a bit different... if the environment suddenly changes, which group is in more trouble? Why does having variety actually help the survival of the group?",
                     type: "application",
                     difficulty: "advanced",
                     target_statements: [1, 2],

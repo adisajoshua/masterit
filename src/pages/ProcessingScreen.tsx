@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { useApp } from "@/context/AppContext";
 import { RealAdaptiveService, USE_REAL_AI } from "@/services/ai/RealAdaptiveService";
 import { AdaptiveConcept } from "@/types/adaptive";
+import { mockAdaptiveConcepts } from "@/data/mockAdaptiveData";
 
 interface ProcessingStep {
   id: string;
@@ -60,8 +61,14 @@ const ProcessingScreen = () => {
           // Step 2: Concepts & Plan (Real AI)
           setCurrentStep(1);
 
-          // Call API
-          const result = await RealAdaptiveService.generateCurriculum(studyMaterial);
+          // Call API with timeout protection (30s max)
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('API timeout after 30s')), 30000)
+          );
+          const result = await Promise.race([
+            RealAdaptiveService.generateCurriculum(studyMaterial),
+            timeoutPromise
+          ]) as { concepts: AdaptiveConcept[] };
 
           if (!isMounted) return;
 
@@ -74,16 +81,20 @@ const ProcessingScreen = () => {
           await new Promise(r => setTimeout(r, 1000));
           setCompletedSteps(prev => [...prev, "plan"]);
 
-          // Update Context
-          if (result.concepts && Array.isArray(result.concepts)) {
+          // Update Context with AI-generated concepts
+          if (result.concepts && Array.isArray(result.concepts) && result.concepts.length > 0) {
             setConcepts(result.concepts as AdaptiveConcept[]);
+          } else {
+            // AI returned empty — fallback to mock
+            console.warn('AI returned empty concepts, falling back to mock data');
+            setConcepts(mockAdaptiveConcepts);
           }
 
           // Done
           setTimeout(() => navigate("/concepts"), 500);
 
         } else {
-          // Fallback / Mock Mode
+          // Fallback / Mock Mode — load mock concepts so Concepts screen has data
           setCurrentStep(1);
           await new Promise(r => setTimeout(r, 2000));
           setCompletedSteps(prev => [...prev, "concepts"]);
@@ -91,6 +102,9 @@ const ProcessingScreen = () => {
           setCurrentStep(2);
           await new Promise(r => setTimeout(r, 1500));
           setCompletedSteps(prev => [...prev, "plan"]);
+
+          // Load mock data into context
+          setConcepts(mockAdaptiveConcepts);
 
           setTimeout(() => navigate("/concepts"), 800);
         }

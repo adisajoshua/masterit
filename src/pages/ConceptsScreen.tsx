@@ -35,9 +35,14 @@ const ConceptsScreen = () => {
     navigate("/teaching");
   };
 
-  const getConfidenceStars = (confidence: string) => {
-    if (confidence === 'high') return 5;
-    if (confidence === 'medium') return 3;
+  const getDynamicStars = (concept: AdaptiveConcept) => {
+    const mastery = concept.mastery || 0;
+    if (mastery === 0) return 0; // Don't show fake stars for unstarted concepts
+
+    if (mastery >= 90) return 5;
+    if (mastery >= 75) return 4;
+    if (mastery >= 50) return 3;
+    if (mastery >= 25) return 2;
     return 1;
   };
 
@@ -95,7 +100,7 @@ const ConceptsScreen = () => {
               {concepts.map((concept, index) => {
                 const isCompleted = completedConcepts.includes(concept.id);
                 // Map AdaptiveConcept fields to UI
-                const starCount = getConfidenceStars(concept.parsing_confidence);
+                const starCount = getDynamicStars(concept);
                 const mastery = concept.mastery || 0;
                 const snippet = concept.snippet || concept.source_text_snippet || "";
 

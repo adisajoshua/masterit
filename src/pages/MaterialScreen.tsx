@@ -8,7 +8,7 @@ import RetroTextArea from "@/components/retro-ui/RetroTextArea";
 import ModeChip from "@/components/ui/ModeChip";
 import BackNavigation from "@/components/ui/BackNavigation";
 import { useApp } from "@/context/AppContext";
-import { mockSession } from "@/data/mockData";
+import { evolutionInputText } from "@/data/mockData";
 
 const MaterialScreen = () => {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ const MaterialScreen = () => {
   };
 
   const handleUseSample = () => {
-    setLocalStudyMaterial(mockSession.sourceText);
+    setLocalStudyMaterial(evolutionInputText);
   };
 
   return (

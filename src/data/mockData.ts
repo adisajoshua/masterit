@@ -67,7 +67,7 @@ export const concepts: Concept[] = [
     title: "Natural Selection",
     snippet: "Organisms with advantageous traits survive and reproduce more successfully, leading to gradual changes in populations over generations.",
     confidence: 5,
-    mastery: 85,
+    mastery: 0,
     questions: [
       { id: "q1", text: "What is natural selection in simple terms?", expectedAnswer: "It's when organisms with helpful traits survive better and have more offspring, so those traits become more common over time." },
       { id: "q2", text: "How does this cause species to change?", expectedAnswer: "Over many generations, helpful traits keep getting passed on while harmful ones disappear, so the whole population slowly changes." },
@@ -84,7 +84,7 @@ export const concepts: Concept[] = [
     title: "Evidence for Evolution",
     snippet: "Multiple lines of evidence support evolution: fossils, comparative anatomy, embryology, DNA, and biogeography.",
     confidence: 4,
-    mastery: 72,
+    mastery: 0,
     questions: [
       { id: "q1", text: "What proof do we have that evolution happened?", expectedAnswer: "Fossil records, similar bone structures in different animals, similar embryos, matching DNA sequences, and species distribution patterns." },
       { id: "q2", text: "What are transitional forms?", expectedAnswer: "Fossils that show features of both ancestor and descendant species, like Archaeopteryx with bird feathers but dinosaur teeth." },
@@ -96,7 +96,7 @@ export const concepts: Concept[] = [
     title: "Genetic Drift",
     snippet: "Random changes in allele frequencies, especially in small populations. Includes bottleneck and founder effects.",
     confidence: 3,
-    mastery: 40,
+    mastery: 0,
     questions: [
       { id: "q1", text: "What is genetic drift?", expectedAnswer: "Random changes in gene frequencies that aren't based on survival advantage - any trait can increase or decrease by chance." },
       { id: "q2", text: "What is the bottleneck effect?", expectedAnswer: "When a population is drastically reduced, survivors have only a fraction of original genetic diversity." },
@@ -148,13 +148,14 @@ export const mockSession: CycleSummary = {
     },
     {
       id: "h3",
-      question: "What is genetic drift?",
+      question: "What is natural selection in simple terms?",
       userAnswer: "I don't know.",
       aiFeedback: "Hmm, is it like when something random happens? I'm a bit lost too...",
       score: 0.1,
       status: "incorrect"
     }
-  ]
+  ],
+  timeSpent: "7:42"
 };
 
 export const mockAchievements = [

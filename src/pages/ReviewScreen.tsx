@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Clock, HelpCircle, Trophy, CheckCircle, Download, RotateCcw, ArrowUpRight, ChevronDown, ChevronUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle, Clock, HelpCircle, Download, ArrowRight, TrendingUp, Trophy, RotateCcw, ArrowUpRight, ChevronDown, ChevronUp } from "lucide-react";
 import PixelAvatar from "@/components/PixelAvatar";
 import MessageBox from "@/components/ui/MessageBox";
 import RetroButton from "@/components/retro-ui/RetroButton";
@@ -9,7 +9,7 @@ import ModeChip from "@/components/ui/ModeChip";
 import XPCounter from "@/components/ui/XPCounter";
 import BackNavigation from "@/components/ui/BackNavigation";
 import { useApp } from "@/context/AppContext";
-import { mockSession, mockAchievements } from "@/data/mockData";
+import { mockAchievements } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import { NextStepCard, NextStepType } from "@/components/adaptive/NextStepCard";
 
@@ -59,13 +59,25 @@ Score: ${h.score * 100}%
     URL.revokeObjectURL(url);
   };
 
-  // PRIORITY 1: Dynamic Data Selection
-  // Use currentCycleSummary if available, else fallback to mockSession for safety/demo
-  const effectiveSession = currentCycleSummary || mockSession;
+  // BUG 2 FIX: No more mock fallback — redirect if no real data
+  if (!currentCycleSummary) {
+    navigate('/concepts');
+    return null;
+  }
+
+  const effectiveSession = currentCycleSummary;
   const history = effectiveSession.history || [];
 
+  const totalQuestions = effectiveSession.history?.length || 0;
+
+  const sessionXP = effectiveSession.history?.reduce((acc: number, h: any) => {
+    // Score is stored as 0-1 (e.g. 1/3, 2/3, 3/3)
+    const rawScore = Math.round(h.score * 3);
+    const reward = rawScore === 3 ? 50 : rawScore === 2 ? 30 : 10;
+    return acc + reward;
+  }, 0) || 0;
+
   // Calculate session stats
-  const totalQuestions = history.length;
   const averageMastery = effectiveSession.confidenceScore || 0;
 
   // Determine intelligent next step
@@ -146,7 +158,6 @@ Score: ${h.score * 100}%
 
             {/* Quick stats */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {/* ... existing stats ... */}
               {[
                 {
                   icon: Clock,
@@ -158,10 +169,16 @@ Score: ${h.score * 100}%
                   icon: HelpCircle,
                   label: "Questions",
                   value: totalQuestions.toString(),
-                  color: "text-turquoise",
+                  color: "text-coral",
                 },
                 {
-                  icon: Trophy,
+                  icon: TrendingUp,
+                  label: "XP Gained",
+                  value: `+${sessionXP}`,
+                  color: "text-gold",
+                },
+                {
+                  icon: CheckCircle, // Assuming Trophy was replaced by CheckCircle based on the new import line, or it was a typo in the diff. Sticking to the diff's implied structure.
                   label: "Overall Mastery",
                   value: `${averageMastery}%`,
                   color: "text-coral",

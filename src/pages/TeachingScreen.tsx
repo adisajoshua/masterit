@@ -43,7 +43,10 @@ const TeachingScreen = () => {
     conceptTitle,
     progress,
     remediationData,
-    triggerAdaptation
+    triggerAdaptation,
+    coveredIndices,
+    latestFeedback,
+    clearFeedback
   } = useAdaptiveSession(selectedConcept?.id);
 
   const [answer, setAnswer] = useState("");
@@ -52,10 +55,12 @@ const TeachingScreen = () => {
   const [avatarState, setAvatarState] = useState<AvatarState>("speaking");
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [showRemediation, setShowRemediation] = useState(false);
-  const [showMobileContext, setShowMobileContext] = useState(false); // New state for mobile context
+  const [showMobileContext, setShowMobileContext] = useState(false);
   const [isSessionComplete, setIsSessionComplete] = useState(false);
   const [displayedQuestionText, setDisplayedQuestionText] = useState("");
   const [activeHint, setActiveHint] = useState<string | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackText, setFeedbackText] = useState<string | null>(null);
 
   useEffect(() => {
     if (currentQuestion) {
@@ -92,15 +97,44 @@ const TeachingScreen = () => {
     setIsEvaluating(true);
     setAvatarState("thinking");
 
-    const result = await submitAnswer(answer);
+    try {
+      const result = await submitAnswer(answer);
 
-    addXP(50);
-    setAnswer("");
-    setIsEvaluating(false);
-    setAvatarState("speaking");
+      // Dynamic XP Reward based on quality score
+      const score = result?.score ?? 2;
+      if (score > 0) {
+        const xpReward = score === 3 ? 50 : score === 2 ? 30 : 10;
+        addXP(xpReward);
+        setAnswer("");
+      }
 
-    if (result && result.isComplete) {
-      setIsSessionComplete(true);
+      // BUG 12 FIX: Show AI persona feedback between questions
+      if (result?.feedback) {
+        setFeedbackText(result.feedback);
+        setShowFeedback(true);
+        setAvatarState("speaking");
+        setIsEvaluating(false);
+
+        // Show feedback for 3 seconds, then advance
+        setTimeout(() => {
+          setShowFeedback(false);
+          setFeedbackText(null);
+          clearFeedback();
+          if (result.isComplete) {
+            setIsSessionComplete(true);
+          }
+        }, 3500);
+      } else {
+        if (result && result.isComplete) {
+          setIsSessionComplete(true);
+        }
+        setIsEvaluating(false);
+        setAvatarState("speaking");
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      setIsEvaluating(false);
+      setAvatarState("speaking");
     }
   };
 
@@ -222,6 +256,7 @@ const TeachingScreen = () => {
                 concept={concept}
                 currentDifficulty={currentDifficulty}
                 progress={progress}
+                coveredIndices={coveredIndices}
                 isMobile={true}
                 onClose={() => setShowMobileContext(false)}
               />
@@ -275,21 +310,53 @@ const TeachingScreen = () => {
                 <PixelAvatar state={avatarState} size="teaching" className="mx-auto lg:mx-0" animated />
                 <div className="relative group w-full">
                   <div className="relative w-full">
-                    <MessageBox
-                      message={displayedQuestionText || "Loading..."}
-                      variant="solid"
-                      className="text-lg lg:text-xl leading-relaxed shadow-[4px_4px_0_0_rgba(0,0,0,1)] border-2 border-foreground w-full pt-6 text-center lg:text-left"
-                    >
-                      {/* Question Type Badge - Stacked Below */}
-                      <div className="self-end mt-2">
-                        <div className={cn(
-                          "px-2 py-0.5 rounded-md text-[10px] font-bold border border-foreground/30 uppercase tracking-widest bg-surface/50",
-                          questionType === 'diagnostic' ? "text-purple-600 border-purple-200" : "text-blue-600 border-blue-200"
-                        )}>
-                          {questionType === 'diagnostic' ? 'Diagnostic' : questionType}
-                        </div>
-                      </div>
-                    </MessageBox>
+                    <AnimatePresence mode="wait">
+                      {showFeedback && feedbackText ? (
+                        <motion.div
+                          key="feedback"
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <MessageBox
+                            message={feedbackText}
+                            variant="solid"
+                            className="text-lg lg:text-xl leading-relaxed shadow-[4px_4px_0_0_rgba(0,0,0,1)] border-2 border-foreground w-full pt-6 text-center lg:text-left bg-[hsl(var(--accent-teal))]/10 border-[hsl(var(--accent-teal))]"
+                          >
+                            <div className="self-end mt-2">
+                              <div className="px-2 py-0.5 rounded-md text-[10px] font-bold border border-[hsl(var(--accent-teal))]/30 uppercase tracking-widest bg-[hsl(var(--accent-teal))]/10 text-[hsl(var(--accent-teal))]">
+                                AI Feedback
+                              </div>
+                            </div>
+                          </MessageBox>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="question"
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <MessageBox
+                            message={displayedQuestionText || "Loading..."}
+                            variant="solid"
+                            className="text-lg lg:text-xl leading-relaxed shadow-[4px_4px_0_0_rgba(0,0,0,1)] border-2 border-foreground w-full pt-6 text-center lg:text-left"
+                          >
+                            {/* Question Type Badge */}
+                            <div className="self-end mt-2">
+                              <div className={cn(
+                                "px-2 py-0.5 rounded-md text-[10px] font-bold border border-foreground/30 uppercase tracking-widest bg-surface/50",
+                                questionType === 'diagnostic' ? "text-purple-600 border-purple-200" : "text-blue-600 border-blue-200"
+                              )}>
+                                {questionType === 'diagnostic' ? 'Diagnostic' : questionType}
+                              </div>
+                            </div>
+                          </MessageBox>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>
@@ -417,6 +484,7 @@ const TeachingScreen = () => {
             concept={concept!}
             currentDifficulty={currentDifficulty}
             progress={progress}
+            coveredIndices={coveredIndices}
             className="h-full"
           />
         </div>

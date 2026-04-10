@@ -19,7 +19,7 @@ export class SimulatedAdaptiveService implements IAdaptiveService {
      * - Scores based on keyword overlap with core statements.
      * - Determines initial difficulty.
      */
-    async analyzeDiagnostic(response: string, conceptId: string): Promise<AnalysisResult> {
+    async analyzeDiagnostic(response: string, conceptId: string, _concept?: any): Promise<AnalysisResult> {
         await this.delay(1500);
 
         const concept = mockAdaptiveConcepts.find(c => c.id === conceptId);
@@ -69,23 +69,43 @@ export class SimulatedAdaptiveService implements IAdaptiveService {
         await this.delay(1200);
 
         const text = request.response.toLowerCase();
-        const keyTerms = request.expectedKeyTerms?.map(t => t.toLowerCase()) || [];
+
+        // BUG 10 FIX: Extract key terms from targetStatements/coreStatements when expectedKeyTerms is missing
+        const statementsText = [
+            ...(request.targetStatements || []),
+            ...(request.expectedKeyTerms || [])
+        ].join(' ').toLowerCase();
+
+        // Extract meaningful words (4+ chars) from statements as key terms
+        const extractedTerms = statementsText
+            .split(/\s+/)
+            .filter(w => w.length >= 4)
+            .filter(w => !['this', 'that', 'with', 'from', 'have', 'been', 'more', 'they', 'their', 'which', 'when', 'what', 'into', 'does', 'than'].includes(w));
+        const keyTerms = [...new Set(extractedTerms)];
 
         // 1. Keyword Identification
         const matchedTerms = keyTerms.filter(term => text.includes(term));
-        const coverage = keyTerms.length > 0 ? matchedTerms.length / keyTerms.length : 0; // 0-1
+        const coverage = keyTerms.length > 0 ? matchedTerms.length / keyTerms.length : 0;
 
         // 2. Complexity Analysis
         const hasCausal = ["because", "since", "leads to", "due to"].some(w => text.includes(w));
         const hasComparative = ["however", "unlike", "similar to", "whereas"].some(w => text.includes(w));
 
-        // 3. Scoring (1-3 Scale)
-        // 1 = Basic/Incomplete
-        // 2 = Adequate/Correct
-        // 3 = Advanced/Insightful
+        // 2. Gibberish Detection (Priority 2)
+        const words = text.split(/\s+/).filter(w => w.length > 0);
+        const uniqueChars = new Set(text.replace(/\s/g, '').split('')).size;
+        const avgWordLength = words.length > 0 ? text.replace(/\s/g, '').length / words.length : 0;
+
+        // If mostly random chars or very strange patterns
+        const isGibberish = (words.length > 0 && uniqueChars < 5 && words.length > 5) ||
+            (words.length > 0 && avgWordLength > 15 && !text.includes(' ')) ||
+            (text.length > 10 && words.length === 1 && !keyTerms.some(k => text.includes(k)));
+
+        // 3. Scoring (1-3 Scale, 0 for Gibberish)
         let score = 1;
-        if (coverage > 0.4 || (coverage > 0.2 && request.response.length > 30)) score = 2;
-        if (coverage > 0.7 && (hasCausal || hasComparative)) score = 3;
+        if (isGibberish) score = 0;
+        else if (coverage > 0.4 || (coverage > 0.2 && request.response.length > 30)) score = 2;
+        if (score === 2 && coverage > 0.7 && (hasCausal || hasComparative)) score = 3;
 
         // 4. Adaptation Logic
         // If Diagnostic -> Connection

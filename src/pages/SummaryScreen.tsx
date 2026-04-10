@@ -1,3 +1,17 @@
+/**
+ * SummaryScreen.tsx
+ * Purpose: Post-teaching celebration screen showing mastery score, strengths,
+ *          and next-step options after completing a concept cycle.
+ *
+ * Features:
+ *  - Animated mastery reveal with star rating
+ *  - Confetti for high scores (80%+)
+ *  - XP reward display
+ *  - Navigation to deeper dive, next topic, or full review
+ *
+ * Dependencies: AppContext (currentCycleSummary, selectedConcept), PixelAvatar, Confetti.
+ */
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -14,7 +28,6 @@ const SummaryScreen = () => {
   const {
     currentCycleSummary,
     selectedConcept,
-    addXP,
     markConceptComplete,
     setSelectedConcept,
     setCurrentQuestionIndex,
@@ -29,25 +42,45 @@ const SummaryScreen = () => {
       return;
     }
 
-    // Award XP
-    addXP(currentCycleSummary.xpEarned);
+    // BUG 3 FIX: Use confidenceScore (the field that actually exists)
+    const mastery = currentCycleSummary.confidenceScore || 0;
 
     // Animate mastery
     const timer = setTimeout(() => {
-      setAnimatedMastery(currentCycleSummary.masteryPercentage);
+      setAnimatedMastery(mastery);
     }, 500);
 
     // Show confetti for high scores
-    if (currentCycleSummary.masteryPercentage >= 80) {
+    if (mastery >= 80) {
       setTimeout(() => setShowConfetti(true), 1000);
     }
 
     return () => clearTimeout(timer);
-  }, [currentCycleSummary, addXP, navigate]);
+  }, [currentCycleSummary, navigate]);
 
   if (!currentCycleSummary || !selectedConcept) {
     return null;
   }
+
+  const mastery = currentCycleSummary.confidenceScore || 0;
+
+  // Derive strengths and gaps from session data
+  const strengths = currentCycleSummary.history
+    ?.filter((h: any) => h.status === 'correct')
+    .map((h: any) => `Strong answer on: "${h.question.substring(0, 50)}..."`)
+    .slice(0, 3) || ["Good engagement with the material."];
+
+  const gaps = currentCycleSummary.gapsToReview ||
+    currentCycleSummary.history
+      ?.filter((h: any) => h.status === 'incorrect')
+      .map((h: any) => `Review: "${h.question.substring(0, 50)}..."`)
+      .slice(0, 3) || [];
+
+  // Calculate XP from history
+  const xpEarned = currentCycleSummary.history?.reduce((acc: number, h: any) => {
+    const rawScore = Math.round(h.score * 3);
+    return acc + (rawScore === 3 ? 50 : rawScore === 2 ? 30 : 10);
+  }, 0) || 0;
 
   const handleDeeperDive = () => {
     setCurrentQuestionIndex(0);
@@ -74,7 +107,7 @@ const SummaryScreen = () => {
     return 1;
   };
 
-  const stars = getStarRating(currentCycleSummary.masteryPercentage);
+  const stars = getStarRating(mastery);
 
   return (
     <div className="min-h-screen bg-background grid-bg flex flex-col">
@@ -106,9 +139,9 @@ const SummaryScreen = () => {
             {/* Title */}
             <div className="text-center">
               <h1 className="text-2xl font-display font-bold text-foreground">
-                {currentCycleSummary.masteryPercentage >= 80
+                {mastery >= 80
                   ? "Amazing Teaching!"
-                  : currentCycleSummary.masteryPercentage >= 60
+                  : mastery >= 60
                     ? "Good Progress!"
                     : "Keep Practicing!"}
               </h1>
@@ -160,7 +193,7 @@ const SummaryScreen = () => {
             >
               <Flame className="w-6 h-6 text-coral" />
               <span className="text-xl font-bold text-foreground">
-                +{currentCycleSummary.xpEarned} XP
+                +{xpEarned} XP
               </span>
             </motion.div>
 
@@ -172,7 +205,7 @@ const SummaryScreen = () => {
                   <Check className="w-4 h-4" /> Strengths
                 </h3>
                 <ul className="space-y-1">
-                  {currentCycleSummary.strengths.map((strength, i) => (
+                  {strengths.map((strength: string, i: number) => (
                     <motion.li
                       key={i}
                       initial={{ opacity: 0, x: -10 }}
@@ -193,7 +226,7 @@ const SummaryScreen = () => {
                   <AlertCircle className="w-4 h-4" /> To Review
                 </h3>
                 <ul className="space-y-1">
-                  {currentCycleSummary.gaps.map((gap, i) => (
+                  {gaps.length > 0 ? gaps.map((gap: string, i: number) => (
                     <motion.li
                       key={i}
                       initial={{ opacity: 0, x: -10 }}
@@ -204,7 +237,9 @@ const SummaryScreen = () => {
                       <AlertCircle className="w-3 h-3 text-coral mt-1 flex-shrink-0" />
                       {gap}
                     </motion.li>
-                  ))}
+                  )) : (
+                    <p className="text-sm text-muted-foreground italic">No gaps identified!</p>
+                  )}
                 </ul>
               </div>
             </div>

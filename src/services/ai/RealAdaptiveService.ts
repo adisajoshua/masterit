@@ -119,17 +119,19 @@ export class RealAdaptiveService {
             parsing_confidence: flatConcept.parsing_confidence || 'medium',
             estimated_difficulty: flatConcept.estimated_difficulty || 'intermediate',
             core_statements: flatConcept.core_statements || [],
-            diagnostic_prompt: flatConcept.diagnostic_prompt || `What do you already know about ${flatConcept.title}? I'd love to hear your thoughts!`
+            diagnostic_prompt: flatConcept.diagnostic_prompt || `I'm really trying to understand ${flatConcept.title}, but I'm not sure where to start. What's the most important thing I should know about it?`
         };
     }
 
     // --- Public Methods matching SimulatedAdaptiveService signature ---
 
-    static async analyzeDiagnostic(response: string, conceptId: string) {
+    static async analyzeDiagnostic(response: string, conceptId: string, concept?: { diagnostic_prompt?: string; core_statements?: string[] }) {
         const aiResult = await this.callEvaluateApi({
-            question: "Diagnostic Question (Implicit)",
+            question: concept?.diagnostic_prompt || "Tell me what you know about this topic.",
             answer: response,
-            concept: conceptId
+            concept: conceptId,
+            coreStatements: concept?.core_statements || [],
+            targetStatements: concept?.core_statements || [] // Diagnostic covers all statements
         });
 
         // Map AI evaluation to Diagnostic result

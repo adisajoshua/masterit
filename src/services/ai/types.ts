@@ -8,6 +8,8 @@ export interface AnalysisRequest {
     questionType: QuestionType;
     currentDifficulty: DifficultyLevel;
     // Context for accurate grading
+    questionText?: string;
+    coreStatements?: string[];
     targetStatements?: string[];
     expectedKeyTerms?: string[];
 }
@@ -19,7 +21,7 @@ export interface AnalysisResult {
     misconception?: string;
     nextQuestionType?: QuestionType;
     // For holistic tracking
-    analysisDetails: {
+    analysisDetails?: {
         keyTermsUsed: string[];
         conceptCoverage: number; // 0-1
         complexityScore: number; // 0-1
@@ -27,7 +29,7 @@ export interface AnalysisResult {
 }
 
 export interface IAdaptiveService {
-    analyzeDiagnostic(response: string, conceptId: string): Promise<AnalysisResult>;
+    analyzeDiagnostic(response: string, conceptId: string, concept?: any): Promise<AnalysisResult>;
     analyzeResponse(request: AnalysisRequest): Promise<AnalysisResult>;
     generateSummary(history: any[]): Promise<any>;
 }

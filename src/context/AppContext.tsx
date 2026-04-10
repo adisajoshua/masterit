@@ -1,7 +1,21 @@
+/**
+ * AppContext.tsx
+ * Purpose: Global application state provider. Manages user identity, study material,
+ *          concept data, session progress, and XP accumulation.
+ *
+ * Features:
+ *  - Persists all state to localStorage for session resilience
+ *  - Provides session reset with full cleanup (including per-concept keys)
+ *  - Manages concept mastery tracking
+ *  - Stores cycle summary for the Review Screen
+ *
+ * Dependencies: React Context, AdaptiveConcept types, clearConceptSession helper.
+ */
+
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { CycleSummary } from "@/data/mockData";
 import { AdaptiveConcept } from "@/types/adaptive";
-import { mockAdaptiveConcepts } from "@/data/mockAdaptiveData";
+import { clearConceptSession } from "@/hooks/useAdaptiveSession";
 
 interface AppState {
   userName: string;
@@ -20,6 +34,7 @@ interface AppState {
   setCurrentCycleSummary: (summary: CycleSummary | null) => void;
   completedConcepts: string[];
   markConceptComplete: (conceptId: string) => void;
+  updateConceptMastery: (conceptId: string, mastery: number) => void;
   resetSession: () => void;
 }
 
@@ -29,16 +44,25 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [userName, setUserName] = useState(() => localStorage.getItem("userName") || "");
   const [studyMaterial, setStudyMaterial] = useState(() => localStorage.getItem("studyMaterial") || "");
   const [totalXP, setTotalXP] = useState(() => Number(localStorage.getItem("totalXP")) || 0);
+
+  // BUG 8 FIX: Don't fall back to mock data — start with empty array for fresh users
   const [concepts, setConcepts] = useState<AdaptiveConcept[]>(() => {
     const saved = localStorage.getItem("concepts");
-    return saved ? JSON.parse(saved) : mockAdaptiveConcepts;
+    return saved ? JSON.parse(saved) : [];
   });
+
   const [selectedConcept, setSelectedConcept] = useState<AdaptiveConcept | null>(() => {
     const saved = localStorage.getItem("selectedConcept");
     return saved ? JSON.parse(saved) : null;
   });
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [currentCycleSummary, setCurrentCycleSummary] = useState<CycleSummary | null>(null);
+
+  // BUG 2 FIX: Persist currentCycleSummary to localStorage
+  const [currentCycleSummary, setCurrentCycleSummary] = useState<CycleSummary | null>(() => {
+    const saved = localStorage.getItem("currentCycleSummary");
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const [completedConcepts, setCompletedConcepts] = useState<string[]>(() => {
     const saved = localStorage.getItem("completedConcepts");
     return saved ? JSON.parse(saved) : [];
@@ -52,6 +76,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => { localStorage.setItem("selectedConcept", JSON.stringify(selectedConcept)); }, [selectedConcept]);
   useEffect(() => { localStorage.setItem("completedConcepts", JSON.stringify(completedConcepts)); }, [completedConcepts]);
 
+  // BUG 2 FIX: Persist cycle summary
+  useEffect(() => {
+    if (currentCycleSummary) {
+      localStorage.setItem("currentCycleSummary", JSON.stringify(currentCycleSummary));
+    } else {
+      localStorage.removeItem("currentCycleSummary");
+    }
+  }, [currentCycleSummary]);
+
   const addXP = (amount: number) => {
     setTotalXP((prev) => prev + amount);
   };
@@ -62,14 +95,33 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateConceptMastery = (conceptId: string, mastery: number) => {
+    setConcepts((prev) =>
+      prev.map((c) => (c.id === conceptId ? { ...c, mastery } : c))
+    );
+  };
+
   const resetSession = () => {
+    // BUG 7 FIX: Clear all per-concept session localStorage keys
+    concepts.forEach(c => clearConceptSession(c.id));
+
     setUserName("");
     setStudyMaterial("");
     setTotalXP(0);
+    setConcepts([]);
     setSelectedConcept(null);
     setCurrentQuestionIndex(0);
     setCurrentCycleSummary(null);
     setCompletedConcepts([]);
+
+    // Clean up all session-related localStorage
+    localStorage.removeItem("userName");
+    localStorage.removeItem("studyMaterial");
+    localStorage.removeItem("totalXP");
+    localStorage.removeItem("concepts");
+    localStorage.removeItem("selectedConcept");
+    localStorage.removeItem("completedConcepts");
+    localStorage.removeItem("currentCycleSummary");
   };
 
   return (
@@ -82,7 +134,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         totalXP,
         addXP,
         concepts,
-        setConcepts, // Added setter
+        setConcepts,
         selectedConcept,
         setSelectedConcept,
         currentQuestionIndex,
@@ -91,6 +143,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setCurrentCycleSummary,
         completedConcepts,
         markConceptComplete,
+        updateConceptMastery,
         resetSession,
       }}
     >

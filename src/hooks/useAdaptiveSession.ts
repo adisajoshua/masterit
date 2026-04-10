@@ -1,5 +1,19 @@
+/**
+ * useAdaptiveSession.ts
+ * Purpose: Core teaching session state machine. Manages the Diagnostic → Connection → Application
+ *          flow with real-time difficulty adaptation based on AI evaluation.
+ *
+ * Features:
+ *  - Drives the 3-phase adaptive cycle (Diagnostic → Connection → Application)
+ *  - Captures AI persona feedback for display between questions
+ *  - Persists session state to localStorage for resilience
+ *  - Calculates holistic confidence score (30/40/30 weighting)
+ *  - Cleans up session keys on completion
+ *
+ * Dependencies: AppContext, RealAdaptiveService / SimulatedAdaptiveService, adaptive types.
+ */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { AdaptiveConcept, AdaptiveQuestion, DifficultyLevel, QuestionType } from '../types/adaptive';
 import { mockAdaptiveConcepts } from '../data/mockAdaptiveData';
 import { adaptiveService as simulatedService } from '@/services/ai/SimulatedAdaptiveService';
@@ -9,89 +23,115 @@ import { useApp } from "@/context/AppContext";
 // Select the service based on the Feature Flag
 const adaptiveService = USE_REAL_AI ? RealAdaptiveService : simulatedService;
 
-export interface AdaptiveState {
-    currentConcept: AdaptiveConcept;
-    currentQuestion: AdaptiveQuestion;
-    currentDifficulty: DifficultyLevel;
-    questionHistory: AdaptiveQuestion[];
-    adaptationHistory: { from: DifficultyLevel; to: DifficultyLevel; reason: string }[];
-    isRecovering: boolean;
-    progress: number;
+/** Session storage key helpers */
+const sessionKey = (conceptId: string, suffix: string) => `session_${suffix}_${conceptId}`;
+
+/** Clean up all per-concept session keys */
+export function clearConceptSession(conceptId: string) {
+    localStorage.removeItem(sessionKey(conceptId, 'diff'));
+    localStorage.removeItem(sessionKey(conceptId, 'type'));
+    localStorage.removeItem(sessionKey(conceptId, 'index'));
+    localStorage.removeItem(sessionKey(conceptId, 'history'));
+    localStorage.removeItem(sessionKey(conceptId, 'startDiff'));
+}
+
+export interface SessionHistoryEntry {
+    question: string;
+    answer: string;
+    score: number;
+    type: string;
+    difficulty: string;
+    target_statements: number[];
+    aiFeedback: string; // BUG 1 FIX: Store AI persona feedback
 }
 
 export function useAdaptiveSession(conceptId: string = 'natural-selection-adaptive') {
     const { concepts } = useApp();
 
-    // Find concept in Context (Real AI data) OR fallback to Mock Data
-    const [concept] = useState<AdaptiveConcept>(() =>
-        concepts.find(c => c.id === conceptId) || mockAdaptiveConcepts.find(c => c.id === conceptId) || mockAdaptiveConcepts[0]
+    // BUG 11 FIX: Derive concept from concepts array reactively (useMemo, not useState)
+    const concept = useMemo(() =>
+        concepts.find(c => c.id === conceptId) ||
+        mockAdaptiveConcepts.find(c => c.id === conceptId) ||
+        mockAdaptiveConcepts[0],
+        [concepts, conceptId]
     );
 
     const [currentDifficulty, setCurrentDifficulty] = useState<DifficultyLevel>(() =>
-        (localStorage.getItem(`session_diff_${concept.id}`) as DifficultyLevel) || 'intermediate'
+        (localStorage.getItem(sessionKey(concept.id, 'diff')) as DifficultyLevel) || 'intermediate'
     );
     const [questionType, setQuestionType] = useState<QuestionType>(() =>
-        (localStorage.getItem(`session_type_${concept.id}`) as QuestionType) || 'diagnostic'
+        (localStorage.getItem(sessionKey(concept.id, 'type')) as QuestionType) || 'diagnostic'
     );
     const [questionIndex, setQuestionIndex] = useState(() =>
-        Number(localStorage.getItem(`session_index_${concept.id}`)) || 0
+        Number(localStorage.getItem(sessionKey(concept.id, 'index'))) || 0
     );
-    const [history, setHistory] = useState<{ question: string, answer: string, score: number, type: string, difficulty: string }[]>(() => {
-        const saved = localStorage.getItem(`session_history_${concept.id}`);
+    const [history, setHistory] = useState<SessionHistoryEntry[]>(() => {
+        const saved = localStorage.getItem(sessionKey(concept.id, 'history'));
         return saved ? JSON.parse(saved) : [];
     });
-    const [adaptationMessage, setAdaptationMessage] = useState<{ type: string; reason: string; from?: DifficultyLevel; to?: DifficultyLevel } | null>(null);
-    const { setCurrentCycleSummary, addXP, markConceptComplete } = useApp();
+
+    // STRUCT 6 FIX: Track actual start difficulty
+    const [startDifficulty, setStartDifficulty] = useState<DifficultyLevel>(() =>
+        (localStorage.getItem(sessionKey(concept.id, 'startDiff')) as DifficultyLevel) || 'intermediate'
+    );
+
+    const [adaptationMessage, setAdaptationMessage] = useState<{
+        type: string;
+        reason: string;
+        from?: DifficultyLevel;
+        to?: DifficultyLevel;
+    } | null>(null);
+
+    // BUG 12 FIX: Store latest AI feedback for display between questions
+    const [latestFeedback, setLatestFeedback] = useState<string | null>(null);
+
+    const [startTime] = useState(Date.now());
+    const { setCurrentCycleSummary, addXP, markConceptComplete, updateConceptMastery } = useApp();
 
     // Persistence Effects
     useEffect(() => {
-        localStorage.setItem(`session_diff_${concept.id}`, currentDifficulty);
-        localStorage.setItem(`session_type_${concept.id}`, questionType);
-        localStorage.setItem(`session_index_${concept.id}`, questionIndex.toString());
-        localStorage.setItem(`session_history_${concept.id}`, JSON.stringify(history));
-    }, [currentDifficulty, questionType, questionIndex, history, concept.id]);
+        localStorage.setItem(sessionKey(concept.id, 'diff'), currentDifficulty);
+        localStorage.setItem(sessionKey(concept.id, 'type'), questionType);
+        localStorage.setItem(sessionKey(concept.id, 'index'), questionIndex.toString());
+        localStorage.setItem(sessionKey(concept.id, 'history'), JSON.stringify(history));
+        localStorage.setItem(sessionKey(concept.id, 'startDiff'), startDifficulty);
+    }, [currentDifficulty, questionType, questionIndex, history, concept.id, startDifficulty]);
 
     // Helper to get next question based on current state
-    const getNextQuestion = (type: QuestionType, difficulty: DifficultyLevel): AdaptiveQuestion => {
+    const getNextQuestion = useCallback((type: QuestionType, difficulty: DifficultyLevel): AdaptiveQuestion => {
         if (type === 'diagnostic') {
             return {
                 id: 'diagnostic',
                 text: concept.diagnostic_prompt,
                 type: 'diagnostic',
-                difficulty: 'intermediate', // Diagnostic is neutral/open
+                difficulty: 'intermediate',
                 target_statements: [],
                 cognitive_level: 'analyze',
                 remediation: {
-                    hint: "There's no right or wrong answer here. Just tell me what stands out to you most about this topic.",
-                    simplified_text: "In simple terms, what is the main idea of this topic?",
-                    example_answer: "For example, you could say: 'The most important thing is that nature selects the strongest animals.'"
+                    hint: "Don't worry about being perfect! I just want to hear how you'd explain the main idea in your own words so I can start learning.",
+                    simplified_text: "Could you just give me the 'big picture' version of what this topic is all about?",
+                    example_answer: "You could say something like: 'The most important thing to know is that nature has a way of picking which traits help animals survive better.'"
                 }
             };
         }
 
-        // HYBRID: If using Real AI, we might want to ask the service for a question from the pool
-        // But for minimal friction, we can keep using the local pool logic here IF RealAdaptiveService 
-        // doesn't override it. 
-        // Actually, RealAdaptiveService has `generateNextQuestion` as well.
-        // Let's use the local logic here for simplicity unless we refactor completely.
         const poolType = type === 'connection' ? 'connection' : 'application';
-        const pool = concept.question_pools[poolType];
+        const pool = concept.question_pools?.[poolType];
 
-        // Safety Fallback: Use requested difficulty, but fallback to any available question if missing
-        const question = pool[difficulty] || Object.values(pool).find(q => q);
+        if (pool) {
+            const question = pool[difficulty] || Object.values(pool).find(q => q);
+            if (question) return question;
+        }
 
-        if (question) return question;
-
-        // Emergency Fallback: If the pool is totally empty, return the diagnostic prompt again as a placeholder
         return {
             id: 'emergency_fallback',
-            text: `Let's dive deeper into ${concept.title}. Can you explain more about the most important parts as you see them?`,
+            text: `I'm still trying to piece this all together. Could you explain a bit more about how the different parts of ${concept.title} actually work together? I feel like I'm missing a piece of the puzzle.`,
             type: 'diagnostic',
             difficulty: 'intermediate',
             target_statements: [],
             cognitive_level: 'analyze'
         };
-    };
+    }, [concept]);
 
     const [currentQuestion, setCurrentQuestion] = useState<AdaptiveQuestion>(() =>
         getNextQuestion('diagnostic', 'intermediate')
@@ -101,31 +141,40 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
         let nextDifficulty = currentDifficulty;
         let nextType = questionType;
         let adaptation = null;
-        let analysisResult = null;
+        let analysisResult: any = null;
+        let feedbackText = '';
 
         if (questionType === 'diagnostic') {
-            // New AI-driven Diagnostic Analysis
-            analysisResult = await adaptiveService.analyzeDiagnostic(answer, concept.id);
+            // AI-driven Diagnostic Analysis
+            analysisResult = await adaptiveService.analyzeDiagnostic(answer, concept.id, concept);
+            feedbackText = analysisResult.feedback || '';
 
             // Set initial difficulty based on analysis
             nextType = 'connection';
-            // Default to intermediate if no recommendation
             nextDifficulty = (analysisResult.recommendedDifficulty as DifficultyLevel) || 'intermediate';
+
+            // STRUCT 6 FIX: Track the actual start difficulty
+            setStartDifficulty(nextDifficulty);
 
             // Generate adaptation message
             if (nextDifficulty !== 'intermediate') {
                 adaptation = {
                     type: nextDifficulty === 'basic' ? 'difficulty_decrease' : 'difficulty_increase',
                     reason: nextDifficulty === 'basic'
-                        ? "Okay, I think I'm starting to get the basics. Could we keep it simple for now so I don't get mixed up?"
-                        : "Whoa, I think I'm actually following this really well! Do you want to try some of the tricky stuff now?",
-                    from: 'intermediate',
+                        ? "I'm still trying to wrap my head around the core ideas here. Could we keep focusing on the fundamental parts for a bit longer?"
+                        : "That makes so much sense! I think I'm starting to see the bigger picture—could we explore some of the more complex connections now?",
+                    from: 'intermediate' as DifficultyLevel,
                     to: nextDifficulty
                 };
             }
 
         } else if (questionType === 'connection' || questionType === 'application') {
-            // New AI-driven Response Analysis
+            // AI-driven Response Analysis
+            // BUG 6 FIX: Send proper context for evaluation
+            const targetStmts = currentQuestion.target_statements
+                .map(idx => concept.core_statements[idx])
+                .filter(Boolean); // Filter out undefined values
+
             analysisResult = await adaptiveService.analyzeResponse({
                 sessionId: 'sim-session',
                 conceptId: concept.id,
@@ -134,10 +183,24 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
                 currentDifficulty,
                 questionText: currentQuestion.text,
                 coreStatements: concept.core_statements,
-                targetStatements: currentQuestion.target_statements.map(idx => concept.core_statements[idx])
+                targetStatements: targetStmts
             });
 
+            feedbackText = analysisResult.feedback || '';
             const score = analysisResult.score;
+
+            if (score === 0) {
+                // Gibberish / Nonsense Detected
+                const confusionFeedback = "Wait, I'm really sorry, but I'm super confused! I didn't quite catch what you meant there. Could you try explaining that again, maybe in a different way so I can follow along?";
+                setAdaptationMessage({
+                    type: 'confusion',
+                    reason: confusionFeedback,
+                    from: currentDifficulty,
+                    to: currentDifficulty
+                });
+                setLatestFeedback(confusionFeedback);
+                return { isComplete: false, score: 0, feedback: confusionFeedback };
+            }
 
             if (questionType === 'connection') {
                 nextType = 'application';
@@ -146,37 +209,53 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
                     nextDifficulty = 'basic';
                     adaptation = {
                         type: 'difficulty_decrease',
-                        reason: "Wait, I'm a bit lost with those big ideas. Could we go back to the basic concepts first? It would really help me catch up!",
+                        reason: "Wait, I think I'm getting a bit lost in the details. Could we go back and look at how the basic process works again? I want to make sure I really 'get' it before we move on.",
                         from: currentDifficulty,
-                        to: 'basic'
+                        to: 'basic' as DifficultyLevel
                     };
                 } else if (score === 3 && currentDifficulty !== 'advanced') {
                     nextDifficulty = 'advanced';
                     adaptation = {
                         type: 'difficulty_increase',
-                        reason: "Whoa, that's getting really clear! I think I'm ready to try a tougher challenge if you want to push me!",
+                        reason: "Oh, that's a really clear explanation! I think I'm ready to tackle some of the deeper implications of this if you're up for it!",
                         from: currentDifficulty,
-                        to: 'advanced'
+                        to: 'advanced' as DifficultyLevel
                     };
                 }
-            } else { // Application
-                // PRIORITY 2: Holistic Analysis Algorithm (30/40/30)
-                const finalHistory = [...history, {
+            } else {
+                // Application phase — finalize session
+                // BUG 1 FIX: Capture actual AI feedback in history
+                const finalHistory: SessionHistoryEntry[] = [...history, {
                     question: currentQuestion.text,
                     answer,
                     score,
                     type: questionType,
-                    difficulty: currentDifficulty
+                    difficulty: currentDifficulty,
+                    target_statements: currentQuestion.target_statements,
+                    aiFeedback: feedbackText
                 }];
 
-                const coveredIndices = new Set(finalHistory.flatMap(h => h.score >= 2 ? currentQuestion.target_statements : []));
-                const coverageScore = concept.core_statements.length > 0 ? (coveredIndices.size / concept.core_statements.length) : 1;
+                const durationMs = Date.now() - startTime;
+                const minutes = Math.floor(durationMs / 60000);
+                const seconds = Math.floor((durationMs % 60000) / 1000);
+                const timeSpent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                // BUG 9 FIX: Use each history entry's own target_statements, not currentQuestion's
+                const coveredIndices = new Set(
+                    finalHistory.flatMap(h => h.score >= 2 ? h.target_statements : [])
+                );
+                const coverageScore = concept.core_statements.length > 0
+                    ? (coveredIndices.size / concept.core_statements.length)
+                    : 1;
                 const scores = finalHistory.map(h => h.score);
-                const consistencyScore = 1 - (Math.max(...scores) - Math.min(...scores)) / 3;
-                const depthScore = Math.max(...scores) / 3;
+                const maxScore = Math.max(...scores);
+                const minScore = Math.min(...scores);
+                const consistencyScore = maxScore > 0 ? 1 - (maxScore - minScore) / 3 : 0;
+                const depthScore = maxScore / 3;
                 const finalConfidence = (coverageScore * 0.3 + consistencyScore * 0.4 + depthScore * 0.3) * 100;
 
-                setCurrentCycleSummary({
+                // BUG 1 FIX: Use actual AI feedback in the CycleSummary history
+                const cycleSummary = {
                     conceptId: concept.id,
                     confidenceScore: Math.round(finalConfidence),
                     masteryLevel: finalConfidence > 80 ? 'Strong' : finalConfidence > 50 ? 'Developing' : 'Starting',
@@ -184,8 +263,8 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
                         id: i.toString(),
                         question: h.question,
                         userAnswer: h.answer,
-                        aiFeedback: "Great teaching session!",
-                        status: h.score === 3 ? 'correct' : h.score === 2 ? 'partial' : 'incorrect',
+                        aiFeedback: h.aiFeedback || 'Session completed.',
+                        status: (h.score === 3 ? 'correct' : h.score === 2 ? 'partial' : 'incorrect') as 'correct' | 'partial' | 'incorrect',
                         score: h.score / 3
                     })),
                     metrics: {
@@ -194,23 +273,35 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
                         depth: Math.round(depthScore * 100)
                     },
                     trajectory: {
-                        startDifficulty: 'intermediate',
+                        startDifficulty: startDifficulty,  // STRUCT 6 FIX: Use actual start
                         endDifficulty: currentDifficulty,
-                        path: finalHistory.map(h => h.difficulty as DifficultyLevel)
-                    }
-                });
+                        path: finalHistory.map(h => h.difficulty)
+                    },
+                    gapsToReview: concept.core_statements.filter((_, idx) => !coveredIndices.has(idx)),
+                    timeSpent
+                };
 
+                setCurrentCycleSummary(cycleSummary);
                 markConceptComplete(concept.id);
-                return { isComplete: true, finalScore: finalConfidence };
+                updateConceptMastery(concept.id, Math.round(finalConfidence));
+
+                // BUG 7 FIX: Clean up session localStorage on completion
+                clearConceptSession(concept.id);
+
+                setLatestFeedback(feedbackText);
+                return { isComplete: true, finalScore: finalConfidence, feedback: feedbackText, score };
             }
         }
 
-        const newHistory = [...history, {
+        // BUG 1 FIX: Store AI feedback in history entry
+        const newHistory: SessionHistoryEntry[] = [...history, {
             question: currentQuestion.text,
             answer,
             score: analysisResult?.score || 2,
             type: questionType,
-            difficulty: currentDifficulty
+            difficulty: currentDifficulty,
+            target_statements: currentQuestion.target_statements,
+            aiFeedback: feedbackText
         }];
         setHistory(newHistory);
 
@@ -220,8 +311,13 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
         setCurrentQuestion(getNextQuestion(nextType, nextDifficulty));
         setQuestionIndex(prev => prev + 1);
 
-        return { isComplete: false };
-    }, [currentDifficulty, questionType, concept, currentQuestion, history, setCurrentCycleSummary, markConceptComplete]);
+        // BUG 12 FIX: Expose feedback for display between questions
+        setLatestFeedback(feedbackText);
+
+        return { isComplete: false, score: analysisResult?.score || 2, feedback: feedbackText };
+    }, [currentDifficulty, questionType, concept, currentQuestion, history, setCurrentCycleSummary, markConceptComplete, startTime, getNextQuestion, startDifficulty, updateConceptMastery]);
+
+    const coveredIndices = Array.from(new Set(history.flatMap(h => h.score >= 2 ? h.target_statements : [])));
 
     return {
         currentQuestion,
@@ -234,6 +330,10 @@ export function useAdaptiveSession(conceptId: string = 'natural-selection-adapti
         conceptTitle: concept.title,
         progress: Math.min((questionIndex / 3) * 100, 100),
         remediationData: currentQuestion.remediation,
+        coveredIndices,
+        // BUG 12 FIX: Expose feedback state for TeachingScreen to display
+        latestFeedback,
+        clearFeedback: () => setLatestFeedback(null),
         triggerAdaptation: (type: string, reason: string) => {
             setAdaptationMessage({ type, reason, from: currentDifficulty, to: currentDifficulty });
         }
